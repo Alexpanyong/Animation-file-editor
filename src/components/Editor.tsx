@@ -4,9 +4,10 @@ import Timeline from './Timeline';
 import AnimationCanvas from './AnimationCanvas';
 import PropertiesPanel from './PropertiesPanel';
 import { useAppDispatch, useAppSelector } from '../store/store';
-import { updateCurrentLayer } from '../store/animationSlice';
+import { removeLayer, setAnimation, updateCurrentLayer, updateKeyframeValue, updateLayerProperty, updateScrubberPosition } from '../store/animationSlice';
 import FileUpload from './FileUpload';
 import ApiFetchLoader from './ApiFetchLoader';
+import { WebSocketContext } from '../WebSocketProvider';
 
 const Editor: React.FC = () => {
     const timelineContentRef = useRef<HTMLDivElement>(null);
@@ -14,6 +15,8 @@ const Editor: React.FC = () => {
     const animationName = useAppSelector((state) => state.animation.animationName);
     const [selectedLayerIndex, setSelectedLayerIndex] = useState<number | null>(null);
     const dispatch = useAppDispatch();
+
+    const ws = React.useContext(WebSocketContext);
 
 
     const handleLayerClick = (index: number, layerIndex: number) => {
@@ -31,7 +34,16 @@ const Editor: React.FC = () => {
 
         ws.onmessage = (event) => {
             console.log('Received message:', event.data);
-            // TODO: Handle incoming messages and update Redux store
+            const message = JSON.parse(event.data);
+            switch (message.type) {
+                case 'propertyChange':
+                    // Dispatch Redux action to update the property
+                    dispatch(updateLayerProperty(message.payload));
+                    break;
+                // Add cases for other message types
+                default:
+                    console.error('Unknown message type:', message.type);
+            }
         };
 
         ws.onclose = () => {
@@ -42,6 +54,45 @@ const Editor: React.FC = () => {
             ws.close(); // Close the connection when the component unmounts
         };
     }, []);
+
+    useEffect(() => {
+        if (ws) {
+            (ws as WebSocket).onmessage = (event: MessageEvent) => {
+                const message: { type: string, payload: any } = JSON.parse(event.data);
+                switch (message.type) {
+                    case 'setAnimation':
+                        dispatch(setAnimation(message.payload));
+                        break;
+                    case 'updateCurrentLayer':
+                        dispatch(updateCurrentLayer(message.payload));
+                        break;
+                    case 'updateScrubberPosition':
+                        dispatch(updateScrubberPosition(message.payload));
+                        break;
+                    case 'updateLayerProperty':
+                        dispatch(updateLayerProperty(message.payload));
+                        break;
+                    case 'removeLayer':
+                        dispatch(removeLayer(message.payload));
+                        break;
+                    case 'updateKeyframeValue':
+                        dispatch(updateKeyframeValue(message.payload));
+                        break;
+                    case 'layerAdded':
+                        dispatch(addLayer(message.payload));
+                        break;
+                    case 'layerDeleted':
+                        dispatch(removeLayer(message.payload.layerIndex));
+                        break;
+                    case 'layerReordered':
+                        dispatch(reorderLayers(message.payload));
+                        break;
+                    default:
+                        console.error('Unknown message type:', message.type);
+                }
+            };
+        }
+    }, [ws, dispatch]);
 
 
     return (
@@ -83,3 +134,11 @@ const Editor: React.FC = () => {
 };
 
 export default Editor;
+function addLayer(payload: any): any {
+    throw new Error('Function not implemented.');
+}
+
+function reorderLayers(payload: any): any {
+    throw new Error('Function not implemented.');
+}
+

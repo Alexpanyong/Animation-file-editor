@@ -16,6 +16,9 @@ export interface Animation {
     markers: Marker[];
     props: any;
     currentFrame?: number;
+    layerIndex?: number;
+    propertyName?: string;
+    newValue?: any;
 }
 
 export interface Asset {
@@ -67,10 +70,46 @@ export interface Layer {
     op: number;
     st: number;
     bm: number;
+    extra?: any;
 }
 
 export interface Marker {
     cm: string;
     tm: number;
     dr: number;
+}
+
+
+
+// WebSocket message types)
+export interface WebSocketMessage {
+    type: string;
+    payload: any;
+}
+
+// Property change message
+export interface PropertyChangeMessage extends WebSocketMessage {
+    type: 'propertyChange' | 'updateKeyframeValue' | 'updateLayerProperty';
+    payload: {
+        layerIndex: number;
+        propertyName: string;
+        newValue: any;
+        index?: number | null | undefined;
+        keyframeIndex?: number | null | undefined;
+        layer?: Layer | any;
+    };
+}
+
+// Layer change messages (add, delete, reorder)
+export interface LayerChangeMessage extends WebSocketMessage {
+    type: 'layerAdded' | 'layerDeleted' | 'layerReordered';
+    payload: {
+        layerIndex: number | null | undefined | any;
+        propertyName: string;
+        newValue: any;
+        index?: number | null | undefined;
+        sourceIndex?: number | null | undefined;
+        destinationIndex?: number | null | undefined;
+        layer?: Layer | any;
+    };
 }

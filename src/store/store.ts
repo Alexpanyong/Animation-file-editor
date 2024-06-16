@@ -11,6 +11,7 @@ const store = configureStore({
 
 export type RootState = {
     animation: {
+        selectedLayerIndex: any;
         animationID: string;
         animationName: string;
         currentAnimation: Animation | null;

@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Layer } from '../types';
+import React, { useState, useEffect, useContext } from 'react';
+import { Layer, PropertyChangeMessage } from '../types';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { updateLayerProperty } from '../store/animationSlice';
+import { WebSocketContext } from '../WebSocketProvider';
 
 const PropertiesPanel: React.FC = () => {
     const dispatch = useAppDispatch();
     const currentFrame = useAppSelector((state) => state.animation.currentFrame);
     const currentLayer: Layer | any = useAppSelector((state) => state.animation.currentLayer);
     const currentLayerKS = currentLayer?.ks;
+
+    const ws = useContext(WebSocketContext);
 
     interface Keyframe {
         currentFrame: number;
@@ -34,15 +37,19 @@ const PropertiesPanel: React.FC = () => {
 
         if (typeof property === 'number') {
             // If the property is a single number, return it as an array with three elements for scale
-            return property;
+            return [property, property, property];
         } else if (Array.isArray(property) && property.length > 0) {
             if (typeof property[0] === "number") {
                 // If the property is an array of numbers, return the value at the given index
                 return property[index];
             } else if ("t" in property[0]) {  // Property is an array of keyframes, [{...}, {...}, {...}, ...]
                 const keyframes = property as Keyframe[];
-                const keyframeIndex = keyframes.findIndex(
-                    (kf) => kf.t !== null && kf.t !== undefined && Number(kf.t) >= currentFrame
+                const validKeyframes = keyframes.filter((kf) => kf.t !== null && kf.t !== undefined); // Filter out keyframes without t
+                if (validKeyframes.length === 0) {
+                    return null; // No valid keyframes found
+                }
+                const keyframeIndex = validKeyframes.findIndex(
+                    (kf) => Number(kf.t) >= currentFrame
                 );
 
                 if (keyframeIndex === -1) {  // No keyframe found after the current frame, return the last keyframe value
@@ -140,6 +147,17 @@ const PropertiesPanel: React.FC = () => {
             } else {
                 dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue, currentFrame }));
             }
+
+            const message: PropertyChangeMessage = {
+                type: 'propertyChange',
+                payload: {
+                    layerIndex: currentLayer.ind,
+                    propertyName,
+                    newValue,
+                    index,
+                },
+            };
+            ws?.send(JSON.stringify(message));
         }
     };
 
