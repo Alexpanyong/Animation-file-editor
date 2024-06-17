@@ -42,10 +42,10 @@ const initialState: AnimationState = {
     loadThrough: '',
 };
 
-export const addLayer = createAsyncThunk(
+export const addLayer = createAsyncThunk<Animation, Layer, { state: RootState, extra: WebSocket }>(
     "animation/addLayer",
-    async (layer: Layer, { dispatch, getState, extra: ws }): Promise<void> => {
-        const state = getState() as RootState; // Get the current state
+    async (layer, { getState, extra: ws }) => {
+        const state = getState();
 
         // Use immer to create a new state object with the added layer
         const newAnimation = {
@@ -59,10 +59,10 @@ export const addLayer = createAsyncThunk(
                 type: "layerAdded",
                 payload: (layer as any),
             };
-            (ws as WebSocket).send(JSON.stringify(message));
+            ws.send(JSON.stringify(message));
         }
 
-        return (newAnimation as any);
+        return (newAnimation as Animation);
     }
 );
 
@@ -104,7 +104,7 @@ export const reorderLayers = createAsyncThunk(
     "animation/reorderLayers",
     async (
         { sourceIndex, destinationIndex }: { sourceIndex: number; destinationIndex: number },
-        { dispatch, getState, extra: ws }
+        { getState, extra: ws }
     ) => {
         const state = getState() as RootState;
 
@@ -182,21 +182,32 @@ export const updateLayerProperty = createAsyncThunk(
                     ks: {
                         [propertyName]: {
                             k: {
-                                0: {
-                                    s: {
-                                        $apply: (s: any) => {
-                                            if (Array.isArray(s)) {
-                                                // If s is already an array, update the specific index
-                                                const newScale = [...s];
-                                                newScale[index || 0] = newValue;
-                                                return newScale;
-                                            } else {
-                                                // If s is a number, create a new array with the updated value
-                                                return [newValue, newValue, newValue]; // Ensure uniform scaling
-                                            }
-                                        },
-                                    },
+                                $apply: (k: any) => {
+                                    if (Array.isArray(k)) {
+                                        // If k is already an array, update the specific index
+                                        const newKeyframes = [...k];
+                                        newKeyframes[index || 0] = { s: newValue };
+                                        return newKeyframes;
+                                    } else {
+                                        // If k is a number, create a new array with the updated value
+                                        return [{ s: newValue }];
+                                    }
                                 },
+                                // 0: {
+                                //     s: {
+                                //         $apply: (s: any) => {
+                                //             if (Array.isArray(s)) {
+                                //                 // If s is already an array, update the specific index
+                                //                 const newScale = [...s];
+                                //                 newScale[index || 0] = newValue;
+                                //                 return newScale;
+                                //             } else {
+                                //                 // If s is a number, create a new array with the updated value
+                                //                 return [newValue, newValue, newValue]; // Ensure uniform scaling
+                                //             }
+                                //         },
+                                //     },
+                                // },
                             },
                         },
                     },
@@ -349,7 +360,14 @@ const animationSlice = createSlice({
                 }
             })
             .addCase(reorderLayers.fulfilled, (state, action) => {
-                (state as any).currentAnimation = action.payload;
+                const { sourceIndex, destinationIndex } = action.payload;
+                if (state.currentAnimation) {
+                    const newLayers = Array.from(state.currentAnimation.layers);
+                    const [removed] = newLayers.splice((sourceIndex as number), 1);
+                    newLayers.splice((destinationIndex as number), 0, removed);
+                    state.currentAnimation.layers = newLayers;
+                }
+
                 const ws = (action.meta.arg as any).extra;
                 if (ws) {
                     const message: LayerChangeMessage = {

@@ -19,6 +19,8 @@ export interface Animation {
     layerIndex?: number;
     propertyName?: string;
     newValue?: any;
+    sourceIndex?: number;
+    destinationIndex?: number;
 }
 
 export interface Asset {
@@ -44,9 +46,11 @@ export interface kLevel2 {
 }
 
 export interface TransformProperties {
-    a: number;
-    k: number | number[] | K | any[] | any;
-    ix: number;
+    s?: number | number[] | any[] | any;
+    t?: number;
+    a?: number;
+    k?: number | number[] | K | any[] | any;
+    ix?: number;
 }
 
 export interface Transformations {
@@ -71,6 +75,8 @@ export interface Layer {
     st: number;
     bm: number;
     extra?: any;
+    sourceIndex?: number;
+    destinationIndex?: number;
 }
 
 export interface Marker {

@@ -2,9 +2,9 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch } from "react-redux";
 import { DragDropContext, Droppable, Draggable, DragStart, DropResult } from 'react-beautiful-dnd';
 import _ from 'lodash';
-import { Animation } from '../types';
+import { Animation, Layer } from '../types';
 import { useAppDispatch, useAppSelector } from '../store/store';
-import { removeLayer, setAnimation, updateCurrentLayer, updateKeyframeValue, updateScrubberPosition } from '../store/animationSlice';
+import { addLayer, removeLayer, reorderLayers, setAnimation, updateCurrentLayer, updateKeyframeValue, updateScrubberPosition } from '../store/animationSlice';
 import { WebSocketContext } from '../WebSocketProvider';
 
 const Timeline: React.FC<{ 
@@ -38,7 +38,7 @@ const Timeline: React.FC<{
         const [reorderedItem] = items.splice(result.source.index, 1);
         items.splice(result.destination.index, 0, reorderedItem);
 
-        dispatch(setAnimation(currentAnimation as Animation)); // Update the animation state in Redux
+        dispatch(reorderLayers({ sourceIndex: result.source.index, destinationIndex: result.destination.index }));
         
         // Update currentLayer after dragging
         if (selectedLayerIndex !== null) {
@@ -137,6 +137,30 @@ const Timeline: React.FC<{
         }
     };
 
+    const handleAddLayer = () => {
+        // Generate a new unique layer ID
+        const newLayer: Layer = {
+            ddd: 0,
+            ind: currentAnimation!.layers.length + 1, // Assign a new index
+            ty: 4,
+            nm: `Shape Layer ${currentAnimation!.layers.length + 1}`,
+            sr: 1,
+            ks: {
+                o: { a: 0, k: 100, ix: 11 },
+                p: { a: 0, k: [0, 0, 0], ix: 2 },
+                s: { a: 0, k: [100, 100, 100], ix: 6 },
+                r: { a: 0, k: 0, ix: 10 },
+            },
+            ao: 0,
+            shapes: [],
+            ip: 0,
+            op: 60,
+            st: 0,
+            bm: 0,
+        };
+        dispatch(addLayer(newLayer) as any);
+    };
+
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsDroppableReady(true);
@@ -180,6 +204,7 @@ const Timeline: React.FC<{
                         <div className="current-frame inline-block mr-4 text-lg font-bold">
                             <span className="text-sm font-normal">Current frame:</span> {currentFrame}
                         </div>
+                        <button className="px-2 py-1 mt-1 text-sm border border-slate-400 rounded-lg" onClick={handleAddLayer}>Add Layer</button>
                         <div 
                             className="timeline relative"
                             {...provided.droppableProps}

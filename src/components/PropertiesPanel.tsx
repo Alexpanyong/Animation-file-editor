@@ -37,7 +37,7 @@ const PropertiesPanel: React.FC = () => {
 
         if (typeof property === 'number') {
             // If the property is a single number, return it as an array with three elements for scale
-            return [property, property, property];
+            return property;
         } else if (Array.isArray(property) && property.length > 0) {
             if (typeof property[0] === "number") {
                 // If the property is an array of numbers, return the value at the given index
