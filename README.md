@@ -1,46 +1,72 @@
-# Getting Started with Create React App
+# Animation File Editor - README
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a Lottie animation editor built with React, Redux, TypeScript, and Tailwind CSS. It allows users to upload and edit Lottie JSON files, manipulate animation properties, manage layers, and collaborate with others in real-time.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Upload Lottie JSON Files:** Easily import Lottie animations for editing.
+- **Edit Layer Properties:** Modify properties like opacity, position, scale, and rotation.
+- **Timeline Scrubbing:** Preview the animation by dragging the scrubber on the timeline.
+- **Layer Management:** Add, delete, and reorder layers in the animation.
+- **Real-time Collaboration:** Multiple users can edit the same animation simultaneously using WebSockets.
 
-### `npm start`
+## Project Structure
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+src/ \
+├── components/ \
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── AnimationCanvas.tsx      &nbsp;&nbsp;&nbsp;// Renders the Lottie animation \
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── Editor.tsx               &nbsp;&nbsp;&nbsp;// Main editor component \
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── FileUpload.tsx           &nbsp;&nbsp;&nbsp;// Handles Lottie JSON file uploads \
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── PropertiesPanel.tsx      &nbsp;&nbsp;&nbsp;// Edits layer properties \
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── Timeline.tsx             &nbsp;&nbsp;&nbsp;// Displays and manages the timeline \
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── WebSocketProvider.tsx    &nbsp;&nbsp;&nbsp;// Provides WebSocket connection context \
+├── server/                      &nbsp;&nbsp;&nbsp;// Backend WebSocket server \
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── server.js \
+├── store/ \
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── animationSlice.ts        &nbsp;&nbsp;&nbsp;// Redux slice for animation state \
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── store.ts                 &nbsp;&nbsp;&nbsp;// Redux store configuration \
+├── types.ts                     &nbsp;&nbsp;&nbsp;// TypeScript interfaces for data models \
+├── App.css                      &nbsp;&nbsp;&nbsp;// Global styles \
+├── App.tsx                      &nbsp;&nbsp;&nbsp;// Root component \
+├── index.css                    &nbsp;&nbsp;&nbsp;// Index styles \
+└── index.tsx                   &nbsp;&nbsp;&nbsp;// Entry point
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Technologies Used
 
-### `npm test`
+- **Frontend:** React, Redux Toolkit, TypeScript, Tailwind CSS
+- **Backend:** Node.js, Express, WebSocket (ws library)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## State Management
 
-### `npm run build`
+- **Redux Toolkit:** Manages the application state, including the current animation data, scrubber position, selected layer, and other relevant information.
+- **Actions:** Define actions to update the state (e.g., `setAnimation`, `updateLayerProperty`, `removeLayer`).
+- **Reducers:** Handle the actions and update the state accordingly.
+- **Selectors:** Extract specific parts of the state for use in components.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Real-Time Collaboration
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- **WebSockets:** Enables real-time communication between multiple users editing the same animation.
+- **Server (server.js):**
+  - Handles WebSocket connections and messages.
+  - Broadcasts changes to all connected clients.
+- **Client (WebSocketProvider.tsx):**
+  - Establishes a WebSocket connection.
+  - Sends messages to the server when actions occur.
+  - Receives messages from the server and updates the Redux store.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Getting Started
 
-### `npm run eject`
+1. **Clone the repository:** `git clone <repository-url>`
+2. **Install dependencies:** `npm install`
+3. **Start the frontend:** `npm start`
+4. **Start the backend:** `node server/server.js` (in a separate terminal)
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Future Enhancements
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **More Property Controls:** Add support for editing more Lottie properties.
+- **Interactive Properties:** Implement visual interactions for adjusting position, scale, etc.
+- **Layer Visibility:** Allow toggling layer visibility.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## License
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+This project is licensed under the MIT License.
