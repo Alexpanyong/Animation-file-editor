@@ -35,11 +35,18 @@ wss.on('connection', (ws) => {
                         }
                     });
                     break;
+                case 'updateScrubberPosition':
+                    // Broadcast the scrubber position change message to all clients (including the sender)
+                    wss.clients.forEach((client) => {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send(message);
+                        }
+                    });
+                    break;
                 default:
                     console.error('Unknown message type:', parsedMessage.type);
             }
         } catch (error) {
-            clients.delete(ws);
             console.error('Error parsing message:', error);
         }
     });

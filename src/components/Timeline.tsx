@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch } from "react-redux";
 import { DragDropContext, Droppable, Draggable, DragStart, DropResult } from 'react-beautiful-dnd';
 import _ from 'lodash';
-import { Animation, Layer } from '../types';
+import { Animation, Layer, WebSocketMessage } from '../types';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { addLayer, removeLayer, reorderLayers, setAnimation, updateCurrentLayer, updateKeyframeValue, updateScrubberPosition } from '../store/animationSlice';
 import { WebSocketContext } from '../WebSocketProvider';
@@ -63,6 +63,12 @@ const Timeline: React.FC<{
         const progress = newPosition / timelineRect.width;
         const currentFrame = Math.floor(progress * currentAnimation!.op); // calculate current frame (froma start from 1 instead of 0)
         dispatch(updateScrubberPosition(currentFrame));
+
+        const message: WebSocketMessage = {
+            type: 'updateScrubberPosition',
+            payload: currentFrame,
+        };
+        ws?.send(JSON.stringify(message));
     };
 
     const handleMouseUp = () => {
