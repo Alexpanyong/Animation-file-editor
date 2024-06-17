@@ -309,6 +309,7 @@ const animationSlice = createSlice({
                     const message: PropertyChangeMessage = {
                         type: 'propertyChange',
                         payload: (action.payload as any),
+                        timestamp: Date.now(),
                     };
                     ws.send(JSON.stringify(message));
                 }

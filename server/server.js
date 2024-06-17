@@ -10,6 +10,9 @@ let currentAnimationState = {
     // ... initial animation data ...
 };
 
+// Object to store latest timestamps for properties/layers
+const latestTimestamps = {};
+
 wss.on('connection', (ws) => {
     clients.add(ws);
     console.log('Client connected');
@@ -23,12 +26,19 @@ wss.on('connection', (ws) => {
             // Check message type and handle accordingly
             switch (parsedMessage.type) {
                 case 'propertyChange':
-                    // Broadcast the property change message to all clients (including the sender)
-                    wss.clients.forEach((client) => {
-                        if (client.readyState === WebSocket.OPEN) {
-                            client.send(message);
-                        }
-                    });
+                    const { layerIndex, propertyName, timestamp } = parsedMessage.payload;
+                    const latestTimestamp = latestTimestamps[`${layerIndex}-${propertyName}`];
+                    if (!latestTimestamp || timestamp > latestTimestamp) {
+                        // Update shared state and broadcast
+                        currentAnimationState.layers[layerIndex].ks[propertyName].k[0].s = parsedMessage.payload.newValue;
+                        latestTimestamps[`${layerIndex}-${propertyName}`] = timestamp;
+                        // Broadcast the property change message to all clients (including the sender)
+                        wss.clients.forEach((client) => {
+                            if (client.readyState === WebSocket.OPEN) {
+                                client.send(message);
+                            }
+                        });
+                    }
                     break;
                 case 'layerAdded':
                 case 'layerDeleted':

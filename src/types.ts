@@ -104,6 +104,7 @@ export interface PropertyChangeMessage extends WebSocketMessage {
         keyframeIndex?: number | null | undefined;
         layer?: Layer | any;
     };
+    timestamp?: number;
 }
 
 // Layer change messages (add, delete, reorder)
