@@ -3,7 +3,6 @@ import React, { useContext } from 'react';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Animation, Layer, LayerChangeMessage, PropertyChangeMessage, Transformations } from '../types';
 import update from 'immutability-helper';
-import { WebSocketContext } from '../WebSocketProvider';
 import { RootState } from './store';
 
 interface AnimationState {
@@ -183,31 +182,25 @@ export const updateLayerProperty = createAsyncThunk(
                         [propertyName]: {
                             k: {
                                 $apply: (k: any) => {
-                                    if (Array.isArray(k)) {
-                                        // If k is already an array, update the specific index
-                                        const newKeyframes = [...k];
-                                        newKeyframes[index || 0] = { s: newValue };
-                                        return newKeyframes;
+                                    if (Array.isArray(k && typeof k[0] === 'number')) {
+                                        // If k is an array of numbers, update the specific index
+                                        const newNumberArray = [...k];
+                                        newNumberArray[index || 0] = newValue;
+                                        return newNumberArray[index || 0];
+                                    } else if (Array.isArray(k && typeof k[0] === 'object')) {
+                                        // If k is an arry of keyframes
+                                        const keyframeIndex = k.findIndex((keyframe: any) => keyframe.t === state.animation.currentFrame);
+                                        if (keyframeIndex !== -1) {
+                                            const newKeyframes = [...k];
+                                            newKeyframes[keyframeIndex].s[index || 0] = newValue;
+                                            return newKeyframes;
+                                        } else {
+                                            return k;
+                                        }
                                     } else {
-                                        // If k is a number, create a new array with the updated value
-                                        return [{ s: newValue }];
+                                        return newValue;
                                     }
                                 },
-                                // 0: {
-                                //     s: {
-                                //         $apply: (s: any) => {
-                                //             if (Array.isArray(s)) {
-                                //                 // If s is already an array, update the specific index
-                                //                 const newScale = [...s];
-                                //                 newScale[index || 0] = newValue;
-                                //                 return newScale;
-                                //             } else {
-                                //                 // If s is a number, create a new array with the updated value
-                                //                 return [newValue, newValue, newValue]; // Ensure uniform scaling
-                                //             }
-                                //         },
-                                //     },
-                                // },
                             },
                         },
                     },
@@ -246,85 +239,6 @@ const animationSlice = createSlice({
         selectLayer(state, action: PayloadAction<number | null>) {
             state.selectedLayerIndex = action.payload;
         },
-        // addLayer: (state, action: PayloadAction<Layer>) => {
-        //     state.currentAnimation?.layers.push(action.payload);
-        //     if (ws) {
-        //         const message: LayerChangeMessage = {
-        //             type: 'layerAdded',
-        //             payload: action.payload,
-        //         };
-        //         ws.send(JSON.stringify(message));
-        //     }
-        // },
-        // removeLayer: (state, action: PayloadAction<number>) => {
-        //     const index = action.payload;  // index of the array layers[] (start from 0)
-        //     if (state.currentAnimation && index >= 0 && index < state.currentAnimation.layers.length) {
-        //         state.currentAnimation.layers.splice(index, 1);
-        //         if (state.currentAnimation.layers.length === 0) {
-        //             state.currentFrame = 0; // Reset currentFrame when all layers are deleted
-        //             state.currentLayer = null; // Reset currentLayer when all layers are deleted
-        //         }
-        //     }
-        //     if (ws) {
-        //         const message: LayerChangeMessage = {
-        //             type: 'layerDeleted',
-        //             payload: { layerIndex: action.payload },
-        //         };
-        //         ws.send(JSON.stringify(message));
-        //     }
-        // },
-        // reorderLayers: (state, action: PayloadAction<{ sourceIndex: number; destinationIndex: number }>) => {
-        //     if (ws) {
-        //         const message: LayerChangeMessage = {
-        //             type: 'layerReordered',
-        //             payload: action.payload,
-        //         };
-        //         ws.send(JSON.stringify(message));
-        //     }
-        // },
-        // updateKeyframeValue: (state, action: PayloadAction<UpdateKeyframeValuePayload>) => {
-        //     const { layerIndex, keyframeIndex, newValue } = action.payload;
-        //     return update(state, {
-        //         currentAnimation: {
-        //             layers: {
-        //                 [layerIndex]: {
-        //                     ks: {
-        //                         k: {
-        //                             [keyframeIndex]: {
-        //                                 s: { 0: { $set: newValue } },
-        //                             },
-        //                         },
-        //                     },
-        //                 },
-        //             },
-        //         },
-        //     });
-        // },
-        // updateLayerProperty: (state, action: PayloadAction<UpdateLayerPropertyPayload>) => {
-        //     const { layerIndex, propertyName, newValue, currentFrame } = action.payload;
-        //     const layer = state.currentAnimation?.layers[layerIndex - 1];
-        //     const transformProperty = layer?.ks[propertyName as keyof Transformations];
-        //     if (layer && layer.ks && transformProperty) {
-        //         if (Array.isArray(newValue)) {
-        //             if (typeof transformProperty.k[0] === 'number') {  // Array of numbers (number[])
-        //                 (transformProperty.k)[0] = newValue[0];  // Update the first value
-        //                 (transformProperty.k)[1] = newValue[1];  // Update the second value
-        //                 (transformProperty.k)[2] = newValue[2];  // Update the third value
-        //             } else if (typeof transformProperty.k[0] === 'object') {  // Array of objects (keyframes)
-        //                 // find the keyframe index that matches the current frame
-        //                 const keyframeIndex = transformProperty.k.findIndex((keyframe: any) => keyframe.t === currentFrame);
-        //                 if (keyframeIndex !== -1) {
-        //                     (transformProperty.k[keyframeIndex].s)[0] = newValue[0];  // Update the first value
-        //                     (transformProperty.k[keyframeIndex].s)[1] = newValue[1];  // Update the second value
-        //                     (transformProperty.k[keyframeIndex].s)[2] = newValue[2];  // Update the third value
-        //                 }
-        //             }
-                    
-        //         } else {
-        //             transformProperty.k = newValue;
-        //         }
-        //     }
-        // },
         updateScrubberPosition: (state, action: PayloadAction<number>) => {
             state.currentFrame = action.payload;
         },
@@ -389,8 +303,7 @@ const animationSlice = createSlice({
                 }
             })
             .addCase(updateLayerProperty.fulfilled, (state, action) => {
-                console.log("++++++______+++ updateLayerProperty.fulfilled:", action.payload);
-                state.currentAnimation = action.payload;
+                state.currentAnimation = action.payload as any;
                 const ws = action.meta.arg.extra;
                 if (ws) {
                     const message: PropertyChangeMessage = {
@@ -409,9 +322,6 @@ export const {
     setAnimationName, 
     updateCurrentLayer, 
     selectLayer, 
-    // removeLayer, 
-    // updateKeyframeValue, 
-    // updateLayerProperty, 
     updateScrubberPosition, 
     updateLoadThrough 
 } = animationSlice.actions;

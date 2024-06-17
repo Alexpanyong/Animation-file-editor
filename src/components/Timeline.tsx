@@ -204,13 +204,13 @@ const Timeline: React.FC<{
                     <div className="timeline-container p-2" ref={containerRef}>
                         {/* ... timeline header ... */}
                         <div className="timeline-header inline-block mr-6 mb-6 text-2xl font-bold text-slate-500">Timeline</div>
+                        <button className="px-2 py-1 mt-1 mr-4 text-sm border border-slate-400 rounded-lg" onClick={handleAddLayer}>Add Layer</button>
                         <div className="current-layer inline-block mr-4 text-lg font-bold">
                             <span className="text-sm font-normal">Current layer:</span> {currentLayer !== null ? `${currentLayer.ind} - ${currentAnimation?.layers[(selectedLayerIndex as number)]?.nm}` : '--'}
                         </div>
                         <div className="current-frame inline-block mr-4 text-lg font-bold">
                             <span className="text-sm font-normal">Current frame:</span> {currentFrame}
                         </div>
-                        <button className="px-2 py-1 mt-1 text-sm border border-slate-400 rounded-lg" onClick={handleAddLayer}>Add Layer</button>
                         <div 
                             className="timeline relative"
                             {...provided.droppableProps}

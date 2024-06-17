@@ -130,9 +130,16 @@ const PropertiesPanel: React.FC = () => {
     const handlePropertyChange = (propertyName: string, newValue: number, index?: number, currentFrame?: number,) => {
         if (currentLayer !== null) {
             if (propertyName === 'p') {
-                const updatedPositionValue = [...currentLayerKS?.p?.k[0]?.s] || [0, 0, 0]; // Get current position values
-                updatedPositionValue[index || 0] = newValue; // Update the correct index (0 for X, 1 for Y, 2 for Z)
-                dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue: updatedPositionValue, currentFrame }));
+                if (typeof currentLayerKS?.p?.k[0] === 'number') {
+                    // Position is a single value, create a new array
+                    dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue: [newValue, newValue, newValue], currentFrame }));
+                } else if (typeof currentLayerKS?.p?.k[0] === 'object' && Array.isArray(currentLayerKS?.p?.k[0]?.s)) {
+                    const updatedPositionValue = [...currentLayerKS?.p?.k[0]?.s] || [0, 0, 0]; // Get current position values
+                    updatedPositionValue[index || 0] = newValue; // Update the correct index (0 for X, 1 for Y, 2 for Z)
+                    dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue: updatedPositionValue, currentFrame }));
+                } else {
+                    dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue, currentFrame }));
+                }
             } else if (propertyName === 's') {
                 let updatedScaleValue;
                 if (Array.isArray(currentLayerKS?.s?.k[0]?.s)) {
