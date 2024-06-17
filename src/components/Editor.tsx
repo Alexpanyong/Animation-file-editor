@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import _ from 'lodash';
 import './Editor.scss';
 import Timeline from './Timeline';
 import AnimationCanvas from './AnimationCanvas';
@@ -104,7 +105,7 @@ const Editor: React.FC = () => {
         <div className="editor-container">
             <FileUpload />
             <ApiFetchLoader />
-            {currentAnimation && (
+            {currentAnimation && !_.isEmpty(currentAnimation) && (
                 <>
                     <div className="dividing-line my-6 px-2 border-t-2 border-slate-200 border-dashed"></div>
                     <div className="animation-name flex gap-8 p-2 text-2xl font-bold">

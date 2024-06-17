@@ -58,8 +58,8 @@ src/ \
 
 1. **Clone the repository:** `git clone <repository-url>`
 2. **Install dependencies:** `npm install`
-3. **Start the frontend:** `npm start`
-4. **Start the backend:** `node server/server.js` (in a separate terminal)
+3. **Start the frontend:** `npm start` (localhost:3000)
+4. **Start the backend:** `node server/server.js` (in a separate terminal, localhost:8080)
 
 ## Future Enhancements
 
