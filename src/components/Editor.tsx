@@ -40,7 +40,9 @@ const Editor: React.FC = () => {
                     // Dispatch Redux action to update the property
                     dispatch(updateLayerProperty(message.payload));
                     break;
-                // Add cases for other message types
+                case 'initialAnimationState':
+                    dispatch(setAnimation(message.payload)); // Initialize state
+                    break;
                 default:
                     console.error('Unknown message type:', message.type);
             }

@@ -5,6 +5,11 @@ const wss = new WebSocket.Server({ port: 8080 });
 // Store connected clients
 const clients = new Set();
 
+// Shared animation state
+let currentAnimationState = {
+    // ... initial animation data ...
+};
+
 wss.on('connection', (ws) => {
     clients.add(ws);
     console.log('Client connected');
@@ -55,4 +60,10 @@ wss.on('connection', (ws) => {
         clients.delete(ws);
         console.log('Client disconnected');
     });
+
+    // Send initial animation state to the new client
+    ws.send(JSON.stringify({
+        type: 'initialAnimationState',
+        payload: currentAnimationState
+    }));
 });
