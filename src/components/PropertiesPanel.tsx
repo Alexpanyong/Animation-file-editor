@@ -148,6 +148,7 @@ const PropertiesPanel: React.FC = () => {
                 dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue, currentFrame }));
             }
 
+            // Send property change message through WebSocket
             const message: PropertyChangeMessage = {
                 type: 'propertyChange',
                 payload: {
@@ -157,6 +158,7 @@ const PropertiesPanel: React.FC = () => {
                     index,
                 },
             };
+
             ws?.send(JSON.stringify(message));
         }
     };

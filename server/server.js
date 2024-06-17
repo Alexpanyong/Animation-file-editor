@@ -18,7 +18,12 @@ wss.on('connection', (ws) => {
             // Check message type and handle accordingly
             switch (parsedMessage.type) {
                 case 'propertyChange':
-                    // Broadcast the propertyChange message to other clients
+                    // Broadcast the property change message to all clients (including the sender)
+                    wss.clients.forEach((client) => {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send(message);
+                        }
+                    });
                     break;
                 case 'layerAdded':
                 case 'layerDeleted':

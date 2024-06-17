@@ -96,7 +96,7 @@ export const removeLayer = createAsyncThunk(
 
         dispatch(selectLayer(newSelectedLayerIndex));
 
-        return newAnimation;
+        return newAnimation as Animation;
     }
 );
 

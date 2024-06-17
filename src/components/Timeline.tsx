@@ -123,7 +123,7 @@ const Timeline: React.FC<{
         // Reset selectedLayerIndex when a selected layer is deleted
         if (selectedLayerIndex === index) {
             setSelectedLayerIndex(null);
-            // dispatch(updateCurrentLayer(null));
+            dispatch(updateCurrentLayer(null));
         } else if (selectedLayerIndex !== null && selectedLayerIndex > index) {
             // If the selected layer is after the deleted layer, adjust the index
             setSelectedLayerIndex(selectedLayerIndex - 1);

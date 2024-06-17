@@ -87,6 +87,9 @@ const Editor: React.FC = () => {
                     case 'layerReordered':
                         dispatch(reorderLayers(message.payload));
                         break;
+                    case 'propertyChange':
+                        dispatch(updateLayerProperty(message.payload));
+                        break;
                     default:
                         console.error('Unknown message type:', message.type);
                 }
