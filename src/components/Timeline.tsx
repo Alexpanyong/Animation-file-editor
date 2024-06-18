@@ -206,10 +206,10 @@ const Timeline: React.FC<{
                             <span className="text-sm font-normal">Current layer:</span> {currentLayer !== null ? `${currentLayer.ind} - ${currentAnimation?.layers[(selectedLayerIndex as number)]?.nm}` : '--'}
                         </div>
                         <div className="current-frame inline-block mr-4 text-lg font-bold">
-                            <span className="text-sm font-normal">Current frame:</span> {currentFrame}
+                            <span className="text-sm font-normal">Current frame:</span> <span className="text-red-500">{currentFrame}</span>
                         </div>
                         <div 
-                            className="timeline relative"
+                            className="timeline relative max-h-80 overflow-x-hidden overflow-y-auto"
                             {...provided.droppableProps}
                             ref={provided.innerRef}
                             onMouseMove={handleMouseMove}

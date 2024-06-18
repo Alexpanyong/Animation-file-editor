@@ -178,7 +178,7 @@ const PropertiesPanel: React.FC = () => {
     };
 
     const checkValidNumber = (value: any) => {
-        return value !== null || value !== undefined || (typeof value === 'number' && !isNaN(value));
+        return value !== null && value !== undefined && (typeof value === 'number' && !isNaN(value));
     };
 
     const isPropertyHasKeyframes = (property: any) => {
@@ -194,23 +194,26 @@ const PropertiesPanel: React.FC = () => {
                     </div>
                     <div className="properties-content text-sm">
                         {/* Opacity */}
-                        {checkValidNumber(opacity) &&
                         <div className="property-item">
                             <label htmlFor="opacity">Opacity:</label>
-                                {isPropertyHasKeyframes(currentLayerKS.o) && <input
-                                type="range"
-                                id="opacity"
-                                min="0"
-                                max="100"
-                                value={opacity}
-                                onChange={(e) => {
-                                    const newValue = parseInt(e.target.value, 10);
-                                    setOpacity(newValue);
-                                    handlePropertyChange('o', newValue);
-                                }}
-                            />}
-                            <span>{opacity}%</span>
-                        </div>}
+                            {checkValidNumber(opacity) 
+                                ? isPropertyHasKeyframes(currentLayerKS.o) 
+                                    ? <input
+                                        type="range"
+                                        id="opacity"
+                                        min="0"
+                                        max="100"
+                                        value={opacity}
+                                        onChange={(e) => {
+                                            const newValue = parseInt(e.target.value, 10);
+                                            setOpacity(newValue);
+                                            handlePropertyChange('o', newValue);
+                                        }}
+                                    />
+                                    : <span>{opacity}%</span>
+                                : "--"
+                            }
+                        </div>
                         
                         {/* Position */}
                         <div>
@@ -347,7 +350,7 @@ const PropertiesPanel: React.FC = () => {
                         {/* Rotation */}
                         <div className="property-item">
                             <label htmlFor="rotation">Rotation:</label>
-                            {rotation !== null 
+                            {checkValidNumber(rotation)
                                 ? isPropertyHasKeyframes(currentLayerKS.r) 
                                     ? <input
                                         type="number"
