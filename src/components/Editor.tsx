@@ -5,24 +5,25 @@ import Timeline from './Timeline';
 import AnimationCanvas from './AnimationCanvas';
 import PropertiesPanel from './PropertiesPanel';
 import { useAppDispatch, useAppSelector } from '../store/store';
-import { removeLayer, setAnimation, updateCurrentLayer, updateKeyframeValue, updateLayerProperty, updateScrubberPosition } from '../store/animationSlice';
+import { removeLayer, selectLayer, setAnimation, updateCurrentLayer, updateKeyframeValue, updateLayerProperty, updateScrubberPosition } from '../store/animationSlice';
 import FileUpload from './FileUpload';
 import ApiFetchLoader from './ApiFetchLoader';
 import { WebSocketContext } from '../WebSocketProvider';
+import { Layer } from '../types';
 
 const Editor: React.FC = () => {
     const timelineContentRef = useRef<HTMLDivElement>(null);
     const currentAnimation = useAppSelector((state) => state.animation.currentAnimation);
     const animationName = useAppSelector((state) => state.animation.animationName);
-    const [selectedLayerIndex, setSelectedLayerIndex] = useState<number | null>(null);
+    const selectedLayerIndex = useAppSelector((state) => state.animation.selectedLayerIndex);
     const dispatch = useAppDispatch();
 
     const ws = React.useContext(WebSocketContext);
 
 
-    const handleLayerClick = (index: number, layerIndex: number) => {
-        setSelectedLayerIndex(index);  // index of the array, layers.map((layer, index) => {...}), (start from 0)
-        dispatch(updateCurrentLayer(layerIndex));  // Update the current layer in Redux (index of the layer itself (layer.ind))
+    const handleLayerClick = (index: number, layer: Layer) => {
+        dispatch(selectLayer(index));  // Update the selected layer index in Redux (index only, start from 0)
+        dispatch(updateCurrentLayer(layer));  // Update the current layer in Redux (entire layer object)
     };
 
 
@@ -94,7 +95,7 @@ const Editor: React.FC = () => {
                         dispatch(updateLayerProperty(message.payload));
                         break;
                     default:
-                        console.error('Unknown message type:', message.type);
+                        console.log('Initiated Animation State:', message.type);
                 }
             };
         }
@@ -126,12 +127,7 @@ const Editor: React.FC = () => {
                                     </div>
                             )}
                         </div>
-                        <Timeline 
-                            timelineContentRef={timelineContentRef} 
-                            onLayerClick={handleLayerClick} 
-                            selectedLayerIndex={selectedLayerIndex} 
-                            setSelectedLayerIndex={setSelectedLayerIndex} 
-                        />
+                        <Timeline timelineContentRef={timelineContentRef} onLayerClick={handleLayerClick} />
                     </div>
                 </>
             )}

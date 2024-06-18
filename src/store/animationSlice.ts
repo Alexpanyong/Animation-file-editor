@@ -10,7 +10,7 @@ interface AnimationState {
     animationName?: string;
     currentAnimation: Animation | null;
     currentFrame: number;
-    currentLayer: number | null;
+    currentLayer: Layer | null;
     loadThrough: string;
     selectedLayerIndex?: number | null;
 }
@@ -24,7 +24,7 @@ interface UpdateKeyframeValuePayload {
 }
 
 interface UpdateLayerPropertyPayload {
-    layerIndex: number;
+    layerIndex: number | any;
     propertyName: string;
     newValue: number | number[];
     currentFrame: number | undefined;
@@ -39,6 +39,7 @@ const initialState: AnimationState = {
     currentFrame: 0,
     currentLayer: null,
     loadThrough: '',
+    selectedLayerIndex: null,  // index of the array, layers.map((layer, index) => {...}), (start from 0)
 };
 
 export const addLayer = createAsyncThunk<Animation, Layer, { state: RootState, extra: WebSocket }>(
@@ -67,29 +68,29 @@ export const addLayer = createAsyncThunk<Animation, Layer, { state: RootState, e
 
 export const removeLayer = createAsyncThunk(
     "animation/removeLayer",
-    async (layerIndex: number, { dispatch, getState, extra: ws }) => {
+    async (index: number, { dispatch, getState, extra: ws }) => {  // index is the index of layers[] array (start from 0)
         const state = getState() as RootState;
 
         // Use immer to create a new state object with the layer removed
         const newAnimation = {
             ...state.animation.currentAnimation,
-            layers: state.animation.currentAnimation!.layers.filter((_, i) => i !== layerIndex),
+            layers: state.animation.currentAnimation!.layers.filter((_, i) => i !== index),
         };
 
         // Send a message to other clients via WebSocket
         if (ws) {
             const message: LayerChangeMessage = {
                 type: "layerDeleted",
-                payload: ({ layerIndex } as any),
+                payload: ({ index } as any),
             };
             (ws as WebSocket).send(JSON.stringify(message));
         }
 
         // Update selectedLayerIndex if necessary
-        let newSelectedLayerIndex = state.animation.selectedLayerIndex;
-        if (newSelectedLayerIndex === layerIndex) {
+        let newSelectedLayerIndex = state.animation.selectedLayerIndex;  // TODO: Check this selectedLayerIndex
+        if (newSelectedLayerIndex === index) {
             newSelectedLayerIndex = null;
-        } else if (newSelectedLayerIndex !== null && newSelectedLayerIndex > layerIndex) {
+        } else if (newSelectedLayerIndex !== null && newSelectedLayerIndex > index) {
             newSelectedLayerIndex--;
         }
 
@@ -140,7 +141,7 @@ export const updateKeyframeValue = createAsyncThunk(
         // Use immer to create a new state object with the updated keyframe value
         const newAnimation = update(state.animation.currentAnimation!, {
             layers: {
-                [layerIndex]: {
+                [layerIndex]: {  // layerIndex is the index of the layers[] array (start from 0)
                     ks: {
                         [propertyName]: {
                             k: {
@@ -174,41 +175,38 @@ export const updateLayerProperty = createAsyncThunk(
         { getState, extra: ws }
     ) => {
         const state = getState() as RootState;
-        console.log('...... slice - UpdateLayerPropertyPayload - layerIndex', layerIndex);
-        console.log('...... slice - UpdateLayerPropertyPayload - propertyName', propertyName);
-        console.log('...... slice - UpdateLayerPropertyPayload - newValue', newValue);
-        console.log('...... slice - UpdateLayerPropertyPayload - index', index);
-        console.log('...... slice - UpdateLayerPropertyPayload - currentFrame', currentFrame);
+        console.log("|||||||||||| layerIndex:", layerIndex);
 
         const newAnimation = update(state.animation.currentAnimation!, {
             layers: {
-                [layerIndex]: {
+                [layerIndex]: {  // layerIndex is the index of the layers[] array (start from 0)
                     ks: {
                         [propertyName]: {
                             k: {
                                 $apply: (k: any) => {
-                                    console.log('........ k:', k);
+                                    console.log(`.... ks.${propertyName}.k (previous):`, k);
                                     if (Array.isArray(k) && typeof k[0] === 'number') {
                                         // If k is an array of numbers, update the specific index
                                         const newNumberArray = [...k];
                                         newNumberArray[index || 0] = newValue;
+                                        console.log(`.... ks.${propertyName}.k (current - Array of numbers):`, newNumberArray);
                                         return newNumberArray;
                                     } else if (Array.isArray(k) && typeof k[0] === 'object') {
                                         // If k is an arry of keyframes
-                                        const keyframeIndex = k.findIndex((keyframe: any) => keyframe.t === state.animation.currentFrame);
+                                        const keyframeIndex = k.findIndex((keyframe) => keyframe.t === state.animation.currentFrame);
                                         if (keyframeIndex !== -1) {
                                             // The current frame is a keyframe
                                             const newKeyframes = [...k];
                                             newKeyframes[keyframeIndex].s[index || 0] = newValue;
-                                            console.log('........ newKeyframes:', newKeyframes);
+                                            console.log(`.... ks.${propertyName}.k (current - Keyframe value):`, newKeyframes);
                                             return newKeyframes;
                                         } else {
                                             // The current frame is not a keyframe
-                                            console.log('........ k (array of keyframes):', k);
+                                            console.log(`.... ks.${propertyName}.k (current - Frame value):`, k);
                                             return k;
                                         }
                                     } else {
-                                        console.log('........ k - else (number):', newValue);
+                                        console.log(`.... ks.${propertyName}.k (current - single number):`, newValue);
                                         return newValue;
                                     }
                                 },
@@ -244,7 +242,7 @@ const animationSlice = createSlice({
         setAnimationName: (state, action: PayloadAction<string>) => {
             state.animationName = action.payload;
         },
-        updateCurrentLayer: (state, action: PayloadAction<number | null>) => {
+        updateCurrentLayer: (state, action: PayloadAction<Layer | null>) => {
             state.currentLayer = action.payload;
         },
         selectLayer(state, action: PayloadAction<number | null>) {

@@ -111,7 +111,7 @@ export interface PropertyChangeMessage extends WebSocketMessage {
 export interface LayerChangeMessage extends WebSocketMessage {
     type: 'layerAdded' | 'layerDeleted' | 'layerReordered';
     payload: {
-        layerIndex: number | null | undefined | any;
+        layerIndex: number | any;
         propertyName: string;
         newValue: any;
         index?: number | null | undefined;

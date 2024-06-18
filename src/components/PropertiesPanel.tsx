@@ -6,6 +6,7 @@ import { WebSocketContext } from '../WebSocketProvider';
 
 const PropertiesPanel: React.FC = () => {
     const dispatch = useAppDispatch();
+    const currentAnimation = useAppSelector((state) => state.animation.currentAnimation);
     const currentFrame = useAppSelector((state) => state.animation.currentFrame);
     const currentLayer: Layer | any = useAppSelector((state) => state.animation.currentLayer);
     const currentLayerKS = currentLayer?.ks;
@@ -129,32 +130,34 @@ const PropertiesPanel: React.FC = () => {
 
     const handlePropertyChange = (propertyName: string, newValue: number, index?: number, currentFrame?: number,) => {
         if (currentLayer !== null) {
+            // find the index of the selected layer from the current animation
+            const layerIndex = currentAnimation?.layers.findIndex((layer: Layer) => layer.ind === currentLayer.ind);
+
             if (propertyName === 'p') {
                 if (typeof currentLayerKS?.p?.k[0] === 'number') {
-                    // Position is a single value, create a new array
+                    // Position is an array of numbers
                     dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue: newValue, index, currentFrame }));
                 } else if (typeof currentLayerKS?.p?.k[0] === 'object' && Array.isArray(currentLayerKS?.p?.k[0]?.s)) {
                     const updatedPositionValue = [...currentLayerKS?.p?.k[0]?.s] || [0, 0, 0]; // Get current position values
                     updatedPositionValue[index || 0] = newValue; // Update the correct index (0 for X, 1 for Y, 2 for Z)
-                    dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue: updatedPositionValue, currentFrame }));
+                    dispatch(updateLayerProperty({ layerIndex, propertyName, newValue: updatedPositionValue, index, currentFrame }));
                 } else {
-                    dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue, currentFrame }));
+                    dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue, index, currentFrame }));
                 }
             } else if (propertyName === 's') {
-                console.log("yes yes - s");
-                let updatedScaleValue;
-                if (Array.isArray(currentLayerKS?.s?.k[0]?.s)) {
-                    // Scale is an array, create a copy and update
-                    updatedScaleValue = [...currentLayerKS?.s.k[0].s];
-                    console.log("yes yes - updatedScaleValue (k[0].s is array):", updatedScaleValue);
+                // let updatedScaleValue;
+
+                if (typeof currentLayerKS?.s?.k[0] === 'number') {
+                    // Scale is an array of numbers
+                    dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue: newValue, index, currentFrame }));
+                } else if (typeof currentLayerKS?.s?.k[0] === 'object' && Array.isArray(currentLayerKS?.s?.k[0]?.s)) {
+                    // Scale is an array of keyframes
+                    const updatedScaleValue = [...currentLayerKS?.s?.k[0]?.s] || [100, 100, 100]; // Get current scale values
+                    updatedScaleValue[index || 0] = newValue; // Update the correct index (0 for X, 1 for Y, 2 for Z)
+                    dispatch(updateLayerProperty({ layerIndex, propertyName, newValue: updatedScaleValue, index, currentFrame }));
                 } else {
-                    // Scale is a single value, create a new array
-                    updatedScaleValue = [100, 100, 100];
-                    console.log("yes yes - updatedScaleValue ([100, 100, 100]):", updatedScaleValue);
+                    dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue, index, currentFrame }));
                 }
-                updatedScaleValue[index || 0] = newValue; // Update the correct index (0 for X, 1 for Y, 2 for Z)
-                console.log("yes yes - updatedScaleValue:", updatedScaleValue);
-                dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue: updatedScaleValue, index, currentFrame }));
             } else {
                 dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue, index, currentFrame }));
             }

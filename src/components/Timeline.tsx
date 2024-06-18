@@ -1,18 +1,14 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { useDispatch } from "react-redux";
 import { DragDropContext, Droppable, Draggable, DragStart, DropResult } from 'react-beautiful-dnd';
-import _ from 'lodash';
-import { Animation, Layer, WebSocketMessage } from '../types';
+import { Layer, WebSocketMessage } from '../types';
 import { useAppDispatch, useAppSelector } from '../store/store';
-import { addLayer, removeLayer, reorderLayers, setAnimation, updateCurrentLayer, updateKeyframeValue, updateScrubberPosition } from '../store/animationSlice';
+import { addLayer, removeLayer, reorderLayers, selectLayer, updateCurrentLayer, updateKeyframeValue, updateScrubberPosition } from '../store/animationSlice';
 import { WebSocketContext } from '../WebSocketProvider';
 
 const Timeline: React.FC<{ 
     timelineContentRef: React.MutableRefObject<HTMLDivElement | null>; 
     onLayerClick: (index: number, layer: any) => void; 
-    selectedLayerIndex: number | null;
-    setSelectedLayerIndex: (index: number | null) => void;
-}> = ({ timelineContentRef, onLayerClick, selectedLayerIndex, setSelectedLayerIndex }) => {
+}> = ({ timelineContentRef, onLayerClick }) => {
     const [isDragging, setIsDragging] = useState(false);
     const [scrubberPosition, setScrubberPosition] = useState(0);
     const [isDroppableReady, setIsDroppableReady] = useState(false);
@@ -24,6 +20,7 @@ const Timeline: React.FC<{
     const currentAnimation = useAppSelector((state) => state.animation.currentAnimation);
     const currentFrame = useAppSelector((state) => state.animation.currentFrame);
     const currentLayer: any = useAppSelector((state) => state.animation.currentLayer);
+    const selectedLayerIndex = useAppSelector((state) => state.animation.selectedLayerIndex);
 
     const handleOnDragStart = (start: DragStart) => {
         const layerIndex = parseInt(start.draggableId);
@@ -97,7 +94,7 @@ const Timeline: React.FC<{
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
-                                className="keyframe absolute top-1/3 w-[20px] h-2 translate-x-1/3 -translate-y-2/4"
+                                className="keyframe absolute top-1/3 w-2 h-2 translate-x-2/4 -translate-y-2/4"
                                 style={{ left: `${(keyframe?.t / currentAnimation!.op) * 100}%`}}
                             >
                                 <div className={`keyframe-dot ${layer.ind === currentLayer?.ind ? "bg-gray-100" : "bg-gray-400"} relative w-full h-full rounded-lg cursor-default`}></div>
@@ -128,12 +125,12 @@ const Timeline: React.FC<{
 
         // Reset selectedLayerIndex when a selected layer is deleted
         if (selectedLayerIndex === index) {
-            setSelectedLayerIndex(null);
+            dispatch(selectLayer(null));
             dispatch(updateCurrentLayer(null));
         } else if (selectedLayerIndex !== null && selectedLayerIndex > index) {
             // If the selected layer is after the deleted layer, adjust the index
-            setSelectedLayerIndex(selectedLayerIndex - 1);
-            dispatch(updateCurrentLayer(selectedLayerIndex - 1));
+            dispatch(selectLayer(selectedLayerIndex - 1));
+            dispatch(updateCurrentLayer(currentAnimation?.layers[selectedLayerIndex - 1]));
         }
         dispatch(removeLayer(index));
 
@@ -181,11 +178,11 @@ const Timeline: React.FC<{
             for (let i = layers.length - 1; i >= 0; i--) {
                 const layer = layers[i];
                 if (layer.ip <= (currentFrame as number) && layer.op >= (currentFrame as number)) {
-                    setSelectedLayerIndex(i);
+                    dispatch(selectLayer(i));
                     return; // Exit the loop once a matching layer is found
                 }
             }
-            setSelectedLayerIndex(null); // No layer found for the current frame
+            dispatch(selectLayer(null)); // No layer found for the current frame
         }
     }, [currentFrame, currentAnimation]);
 
