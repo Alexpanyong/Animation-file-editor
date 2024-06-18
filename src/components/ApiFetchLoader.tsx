@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { GET_ANIMATION } from '../graphql/queries';
 import client from '../graphql/apolloClient';
 import { useAppDispatch } from '../store/store';
-import { setAnimation, setAnimationID, setAnimationName, updateLoadThrough } from '../store/animationSlice';
+import { selectLayer, setAnimation, setAnimationID, setAnimationName, updateCurrentLayer, updateLoadThrough, updateScrubberPosition } from '../store/animationSlice';
 
 const ApiFetchLoader: React.FC = () => {
     const [animationJsonData, setAnimationJsonData] = useState<any | null>(null);
@@ -55,6 +55,9 @@ const ApiFetchLoader: React.FC = () => {
         if (animationJsonData) {
             dispatch(setAnimation(animationJsonData));
             dispatch(updateLoadThrough("API"));
+            dispatch(selectLayer(null));
+            dispatch(updateCurrentLayer(null));
+            dispatch(updateScrubberPosition(0));
         }
     }
 

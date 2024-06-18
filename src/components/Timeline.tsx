@@ -17,6 +17,7 @@ const Timeline: React.FC<{
     const ws = useContext(WebSocketContext);
 
     const dispatch = useAppDispatch();
+    const animationName = useAppSelector((state) => state.animation.animationName);
     const currentAnimation = useAppSelector((state) => state.animation.currentAnimation);
     const currentFrame = useAppSelector((state) => state.animation.currentFrame);
     const currentLayer: any = useAppSelector((state) => state.animation.currentLayer);
@@ -186,6 +187,11 @@ const Timeline: React.FC<{
         }
     }, [currentFrame, currentAnimation]);
 
+    useEffect(() => {
+        if (animationName) {
+            setScrubberPosition(0);  // Reset scrubber position when a new animation is loaded
+        }
+    }, [animationName]);
 
     useEffect(() => {
         if (currentLayer !== null) {
