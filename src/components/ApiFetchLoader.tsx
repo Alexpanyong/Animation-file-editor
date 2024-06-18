@@ -7,6 +7,8 @@ import { selectLayer, setAnimation, setAnimationID, setAnimationName, updateCurr
 
 const ApiFetchLoader: React.FC = () => {
     const [animationJsonData, setAnimationJsonData] = useState<any | null>(null);
+    const [publicAnimationID, setPublicAnimationID] = useState<string>("");  // the ID of the public animation
+    const [publicAnimationName, setPublicAnimationName] = useState<string>("");  // the name of the public animation
     const [fileId, setFileId] = useState<number | null>(null);
     const [loadingJsonDataError, setLoadingJsonDataError] = useState<string | null>(null);
     const dispatch = useAppDispatch();
@@ -26,8 +28,8 @@ const ApiFetchLoader: React.FC = () => {
                     }
                     const animationData = await response.json();
                     setAnimationJsonData(animationData);
-                    dispatch(setAnimationID(data.publicAnimation.id));
-                    dispatch(setAnimationName(data.publicAnimation.name));
+                    setPublicAnimationID(data.publicAnimation.id);
+                    setPublicAnimationName(data.publicAnimation.name);
                 }
                 loadAnimationFromServer();
             }
@@ -53,6 +55,8 @@ const ApiFetchLoader: React.FC = () => {
         console.log("Fetching animation with ID:", fileId);
         console.log("JSON data loaded:", animationJsonData);
         if (animationJsonData) {
+            dispatch(setAnimationID(publicAnimationID));
+            dispatch(setAnimationName(publicAnimationName));
             dispatch(setAnimation(animationJsonData));
             dispatch(updateLoadThrough("API"));
             dispatch(selectLayer(null));
