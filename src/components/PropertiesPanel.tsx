@@ -181,6 +181,10 @@ const PropertiesPanel: React.FC = () => {
         return value !== null || value !== undefined || (typeof value === 'number' && !isNaN(value));
     };
 
+    const isPropertyHasKeyframes = (property: any) => {
+        return Array.isArray(property?.k) && property?.k.length > 0 && typeof property?.k[0] === 'object';
+    }
+
     return (
         <div className="properties-panel p-4 pt-0 ml-4">
             {currentLayer !== null && (
@@ -193,7 +197,7 @@ const PropertiesPanel: React.FC = () => {
                         {checkValidNumber(opacity) &&
                         <div className="property-item">
                             <label htmlFor="opacity">Opacity:</label>
-                            <input
+                                {isPropertyHasKeyframes(currentLayerKS.o) && <input
                                 type="range"
                                 id="opacity"
                                 min="0"
@@ -204,7 +208,7 @@ const PropertiesPanel: React.FC = () => {
                                     setOpacity(newValue);
                                     handlePropertyChange('o', newValue);
                                 }}
-                            />
+                            />}
                             <span>{opacity}%</span>
                         </div>}
                         
@@ -213,17 +217,19 @@ const PropertiesPanel: React.FC = () => {
                             <div className="property-item">
                                 <label htmlFor="positionX">Position X:</label>
                                 {positionX !== null 
-                                    ? <input
-                                        type="number"
-                                        id="positionX"
-                                        min="0"
-                                        value={positionX}
-                                        onChange={(e) => {
-                                            const newValue = parseFloat(e.target.value);
-                                            setPositionX(newValue);
-                                            handlePropertyChange('p', newValue, 0, currentFrame);
-                                        }}
-                                    /> 
+                                    ? isPropertyHasKeyframes(currentLayerKS.p)
+                                        ? <input
+                                            type="number"
+                                            id="positionX"
+                                            min="0"
+                                            value={positionX}
+                                            onChange={(e) => {
+                                                const newValue = parseFloat(e.target.value);
+                                                setPositionX(newValue);
+                                                handlePropertyChange('p', newValue, 0, currentFrame);
+                                            }}
+                                        />
+                                        : <span>{positionX}</span>
                                     : "--"
                                 }
                             </div>
@@ -231,17 +237,19 @@ const PropertiesPanel: React.FC = () => {
                             <div className="property-item">
                                 <label htmlFor="positionY">Position Y:</label>
                                 {positionY !== null 
-                                    ? <input
-                                        type="number"
-                                        id="positionY"
-                                        min="0"
-                                        value={positionY}
-                                        onChange={(e) => {
-                                            const newValue = parseFloat(e.target.value);
-                                            setPositionY(newValue);
-                                            handlePropertyChange('p', newValue, 1, currentFrame);
-                                        }}
-                                    />
+                                    ? isPropertyHasKeyframes(currentLayerKS.p) 
+                                        ? <input
+                                            type="number"
+                                            id="positionY"
+                                            min="0"
+                                            value={positionY}
+                                            onChange={(e) => {
+                                                const newValue = parseFloat(e.target.value);
+                                                setPositionY(newValue);
+                                                handlePropertyChange('p', newValue, 1, currentFrame);
+                                            }}
+                                        />
+                                        : <span>{positionY}</span>
                                     : "--"
                                 }
                             </div>
@@ -249,17 +257,19 @@ const PropertiesPanel: React.FC = () => {
                             <div className="property-item">
                                 <label htmlFor="positionZ">Position Z:</label>
                                 {positionZ !== null 
-                                    ? <input
-                                        type="number"
-                                        id="positionZ"
-                                        min="0"
-                                        value={positionZ}
-                                        onChange={(e) => {
-                                            const newValue = parseFloat(e.target.value);
-                                            setPositionZ(newValue);
-                                            handlePropertyChange('p', newValue, 2, currentFrame);
-                                        }}
-                                    />
+                                    ? isPropertyHasKeyframes(currentLayerKS.p) 
+                                        ? <input
+                                            type="number"
+                                            id="positionZ"
+                                            min="0"
+                                            value={positionZ}
+                                            onChange={(e) => {
+                                                const newValue = parseFloat(e.target.value);
+                                                setPositionZ(newValue);
+                                                handlePropertyChange('p', newValue, 2, currentFrame);
+                                            }}
+                                        />
+                                        : <span>{positionZ}</span>
                                     : "--"
                                 }
                             </div>
@@ -271,7 +281,7 @@ const PropertiesPanel: React.FC = () => {
                                 <label htmlFor="scaleX">Scale X:</label>
                                 {scaleX !== null 
                                     ? <>
-                                        <input
+                                        {isPropertyHasKeyframes(currentLayerKS.s) && <input
                                             type="range"
                                             id="scaleX"
                                             min="0"
@@ -282,7 +292,7 @@ const PropertiesPanel: React.FC = () => {
                                                 setScaleX(newValue);
                                                 handlePropertyChange('s', newValue, 0, currentFrame);
                                             }}
-                                        />
+                                        />}
                                         <span>{scaleX}%</span>
                                     </> 
                                     : "--"
@@ -293,7 +303,7 @@ const PropertiesPanel: React.FC = () => {
                                 <label htmlFor="scaleY">Scale Y:</label>
                                 {scaleY !== null 
                                     ? <>
-                                        <input
+                                        {isPropertyHasKeyframes(currentLayerKS.s) && <input
                                             type="range"
                                             id="scaleY"
                                             min="0"
@@ -304,7 +314,7 @@ const PropertiesPanel: React.FC = () => {
                                                 setScaleY(newValue);
                                                 handlePropertyChange('s', newValue, 1, currentFrame);
                                             }}
-                                        /> 
+                                        />}
                                         <span>{scaleY}%</span>
                                     </>
                                     : "--"
@@ -315,7 +325,7 @@ const PropertiesPanel: React.FC = () => {
                                 <label htmlFor="scaleZ">Scale Z:</label>
                                 {scaleZ !== null 
                                     ? <>
-                                        <input
+                                        {isPropertyHasKeyframes(currentLayerKS.s) && <input
                                             type="range"
                                             id="scaleZ"
                                             min="0"
@@ -326,7 +336,7 @@ const PropertiesPanel: React.FC = () => {
                                                 setScaleZ(newValue);
                                                 handlePropertyChange('s', newValue, 2, currentFrame);
                                             }}
-                                        />
+                                        />}
                                         <span>{scaleZ}%</span>
                                     </>
                                     : "--"
@@ -338,17 +348,19 @@ const PropertiesPanel: React.FC = () => {
                         <div className="property-item">
                             <label htmlFor="rotation">Rotation:</label>
                             {rotation !== null 
-                                ? <input
-                                    type="number"
-                                    id="rotation"
-                                    min="0"
-                                    value={rotation}
-                                    onChange={(e) => {
-                                        const newValue = parseFloat(e.target.value);
-                                        setRotation(newValue);
-                                        handlePropertyChange('r', newValue);
-                                    }}
-                                /> 
+                                ? isPropertyHasKeyframes(currentLayerKS.r) 
+                                    ? <input
+                                        type="number"
+                                        id="rotation"
+                                        min="0"
+                                        value={rotation}
+                                        onChange={(e) => {
+                                            const newValue = parseFloat(e.target.value);
+                                            setRotation(newValue);
+                                            handlePropertyChange('r', newValue);
+                                        }}
+                                    /> 
+                                    : <span>{rotation}</span>
                                 : "--"
                             }
                         </div>
