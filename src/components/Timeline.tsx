@@ -97,10 +97,10 @@ const Timeline: React.FC<{
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
-                                className="keyframe absolute top-1/3 w-2 h-2 -translate-x-2/4 -translate-y-2/4 rounded-full"
+                                className="keyframe absolute top-1/3 w-[20px] h-2 translate-x-1/3 -translate-y-2/4"
                                 style={{ left: `${(keyframe?.t / currentAnimation!.op) * 100}%`}}
                             >
-                                <div className={`keyframe-dot ${layer.ind === currentLayer?.ind ? "bg-gray-100" : "bg-gray-400"} cursor-default`}></div>
+                                <div className={`keyframe-dot ${layer.ind === currentLayer?.ind ? "bg-gray-100" : "bg-gray-400"} relative w-full h-full rounded-lg cursor-default`}></div>
                                 {/* <input
                                     type="number"
                                     value={keyframe.s[0]}
@@ -224,7 +224,7 @@ const Timeline: React.FC<{
                                         <Draggable key={layer.ind} draggableId={layer.ind.toString()} index={index}>
                                             {(provided, snapshot) => (
                                                 <div
-                                                    className={`layer relative h-12 mb-1 px-4 py-2 text-xs cursor-default ${
+                                                    className={`layer relative h-12 mb-1 px-4 py-2 text-xs cursor-default overflow-hidden ${
                                                         snapshot.isDragging
                                                         ? "bg-neutral-200" 
                                                         : layer.ind === currentLayer?.ind ? "bg-slate-400 text-white font-bold" : "bg-neutral-100"}`

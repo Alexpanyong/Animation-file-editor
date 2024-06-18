@@ -170,10 +170,15 @@ export const updateKeyframeValue = createAsyncThunk(
 export const updateLayerProperty = createAsyncThunk(
     "animation/updateLayerProperty",
     async (
-        { layerIndex, propertyName, newValue, index }: UpdateLayerPropertyPayload,
+        { layerIndex, propertyName, newValue, index, currentFrame }: UpdateLayerPropertyPayload,
         { getState, extra: ws }
     ) => {
         const state = getState() as RootState;
+        console.log('...... slice - UpdateLayerPropertyPayload - layerIndex', layerIndex);
+        console.log('...... slice - UpdateLayerPropertyPayload - propertyName', propertyName);
+        console.log('...... slice - UpdateLayerPropertyPayload - newValue', newValue);
+        console.log('...... slice - UpdateLayerPropertyPayload - index', index);
+        console.log('...... slice - UpdateLayerPropertyPayload - currentFrame', currentFrame);
 
         const newAnimation = update(state.animation.currentAnimation!, {
             layers: {
@@ -182,22 +187,28 @@ export const updateLayerProperty = createAsyncThunk(
                         [propertyName]: {
                             k: {
                                 $apply: (k: any) => {
-                                    if (Array.isArray(k && typeof k[0] === 'number')) {
+                                    console.log('........ k:', k);
+                                    if (Array.isArray(k) && typeof k[0] === 'number') {
                                         // If k is an array of numbers, update the specific index
                                         const newNumberArray = [...k];
                                         newNumberArray[index || 0] = newValue;
-                                        return newNumberArray[index || 0];
-                                    } else if (Array.isArray(k && typeof k[0] === 'object')) {
+                                        return newNumberArray;
+                                    } else if (Array.isArray(k) && typeof k[0] === 'object') {
                                         // If k is an arry of keyframes
                                         const keyframeIndex = k.findIndex((keyframe: any) => keyframe.t === state.animation.currentFrame);
                                         if (keyframeIndex !== -1) {
+                                            // The current frame is a keyframe
                                             const newKeyframes = [...k];
                                             newKeyframes[keyframeIndex].s[index || 0] = newValue;
+                                            console.log('........ newKeyframes:', newKeyframes);
                                             return newKeyframes;
                                         } else {
+                                            // The current frame is not a keyframe
+                                            console.log('........ k (array of keyframes):', k);
                                             return k;
                                         }
                                     } else {
+                                        console.log('........ k - else (number):', newValue);
                                         return newValue;
                                     }
                                 },

@@ -96,13 +96,24 @@ const PropertiesPanel: React.FC = () => {
             setScaleY(roundedNumber(getPropertyValue('s', currentFrame, 1)));
             setScaleZ(roundedNumber(getPropertyValue('s', currentFrame, 2)));
             setRotation(roundedNumber(getPropertyValue('r', currentFrame, 0)));
-            console.log("||+++++++++ current frame property +++++++++++||");
-            console.log("|| ++++ Current frame:", currentFrame);
-            console.log("|| ++++ Opacity:", currentLayerKS?.o?.k);
-            console.log("|| ++++ Position :", currentLayerKS?.p?.k);
-            console.log("|| ++++ Scale:", currentLayerKS?.s?.k);
-            console.log("|| ++++ Rotation:", currentLayerKS?.r?.k);
-            console.log("||++++++++++++++++++++++++++++++++++++++++++++||");
+            console.log("||+++++++++ Redux current frame property +++++++++++||");
+            console.log("|| +++ Redux - currentLayer:", currentLayer);
+            console.log("|| +++ Redux - currentframe:", currentFrame);
+            console.log("|| +++ Redux - Opacity:", currentLayerKS?.o?.k);
+            console.log("|| +++ Redux - Position :", currentLayerKS?.p?.k);
+            console.log("|| +++ Redux - Scale:", currentLayerKS?.s?.k);
+            console.log("|| +++ Redux - Rotation:", currentLayerKS?.r?.k);
+            console.log("||++++++++++++++++++++++++++++++++++++++++++++++++++||");
+            console.log("++++||||++ Selected Layer - Current Layer:", `${currentLayer.ind} - ${currentLayer.nm}`);
+            console.log("++++||||++ Selected Layer - Current Frame:", currentFrame);
+            console.log("++++||||++ Selected Layer - Opacity:", opacity);
+            console.log("++++||||++ Selected Layer - Position X:", positionX);
+            console.log("++++||||++ Selected Layer - Position Y:", positionY);
+            console.log("++++||||++ Selected Layer - Position Z:", positionZ);
+            console.log("++++||||++ Selected Layer - Scale X:", scaleX);
+            console.log("++++||||++ Selected Layer - Scale Y:", scaleY);
+            console.log("++++||||++ Selected Layer - Scale Z:", scaleZ);
+            console.log("++++||||++ Selected Layer - Rotation:", rotation);
         } else {
             setOpacity(100);
             setPositionX(0);
@@ -115,24 +126,13 @@ const PropertiesPanel: React.FC = () => {
         }
     }, [currentLayer, currentFrame]);
 
-    useEffect(() => {  
-        console.log("+++++++++||||+++++++++ Current Frame:", currentFrame);
-        console.log("+++++++++||||+++++++++ Opacity:", opacity);
-        console.log("+++++++++||||+++++++++ Position X:", positionX);
-        console.log("+++++++++||||+++++++++ Position Y:", positionY);
-        console.log("+++++++++||||+++++++++ Position Z:", positionZ);
-        console.log("+++++++++||||+++++++++ Scale X:", scaleX);
-        console.log("+++++++++||||+++++++++ Scale Y:", scaleY);
-        console.log("+++++++++||||+++++++++ Scale Z:", scaleZ);
-        console.log("+++++++++||||+++++++++ Rotation:", rotation);
-    }, [currentFrame]);
 
     const handlePropertyChange = (propertyName: string, newValue: number, index?: number, currentFrame?: number,) => {
         if (currentLayer !== null) {
             if (propertyName === 'p') {
                 if (typeof currentLayerKS?.p?.k[0] === 'number') {
                     // Position is a single value, create a new array
-                    dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue: [newValue, newValue, newValue], currentFrame }));
+                    dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue: newValue, index, currentFrame }));
                 } else if (typeof currentLayerKS?.p?.k[0] === 'object' && Array.isArray(currentLayerKS?.p?.k[0]?.s)) {
                     const updatedPositionValue = [...currentLayerKS?.p?.k[0]?.s] || [0, 0, 0]; // Get current position values
                     updatedPositionValue[index || 0] = newValue; // Update the correct index (0 for X, 1 for Y, 2 for Z)
@@ -141,18 +141,22 @@ const PropertiesPanel: React.FC = () => {
                     dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue, currentFrame }));
                 }
             } else if (propertyName === 's') {
+                console.log("yes yes - s");
                 let updatedScaleValue;
                 if (Array.isArray(currentLayerKS?.s?.k[0]?.s)) {
                     // Scale is an array, create a copy and update
                     updatedScaleValue = [...currentLayerKS?.s.k[0].s];
+                    console.log("yes yes - updatedScaleValue (k[0].s is array):", updatedScaleValue);
                 } else {
                     // Scale is a single value, create a new array
                     updatedScaleValue = [100, 100, 100];
+                    console.log("yes yes - updatedScaleValue ([100, 100, 100]):", updatedScaleValue);
                 }
                 updatedScaleValue[index || 0] = newValue; // Update the correct index (0 for X, 1 for Y, 2 for Z)
-                dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue: updatedScaleValue, currentFrame }));
+                console.log("yes yes - updatedScaleValue:", updatedScaleValue);
+                dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue: updatedScaleValue, index, currentFrame }));
             } else {
-                dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue, currentFrame }));
+                dispatch(updateLayerProperty({ layerIndex: currentLayer.ind, propertyName, newValue, index, currentFrame }));
             }
 
             // Send property change message through WebSocket
@@ -214,7 +218,7 @@ const PropertiesPanel: React.FC = () => {
                                         onChange={(e) => {
                                             const newValue = parseFloat(e.target.value);
                                             setPositionX(newValue);
-                                            handlePropertyChange('p', newValue, 0);
+                                            handlePropertyChange('p', newValue, 0, currentFrame);
                                         }}
                                     /> 
                                     : "--"
@@ -232,7 +236,7 @@ const PropertiesPanel: React.FC = () => {
                                         onChange={(e) => {
                                             const newValue = parseFloat(e.target.value);
                                             setPositionY(newValue);
-                                            handlePropertyChange('p', newValue, 1);
+                                            handlePropertyChange('p', newValue, 1, currentFrame);
                                         }}
                                     />
                                     : "--"
@@ -250,7 +254,7 @@ const PropertiesPanel: React.FC = () => {
                                         onChange={(e) => {
                                             const newValue = parseFloat(e.target.value);
                                             setPositionZ(newValue);
-                                            handlePropertyChange('p', newValue, 2);
+                                            handlePropertyChange('p', newValue, 2, currentFrame);
                                         }}
                                     />
                                     : "--"
@@ -316,7 +320,7 @@ const PropertiesPanel: React.FC = () => {
                                             value={scaleZ}
                                             onChange={(e) => {
                                                 const newValue = parseFloat(e.target.value);
-                                                setScaleY(newValue);
+                                                setScaleZ(newValue);
                                                 handlePropertyChange('s', newValue, 2, currentFrame);
                                             }}
                                         />
