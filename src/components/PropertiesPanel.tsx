@@ -198,19 +198,21 @@ const PropertiesPanel: React.FC = () => {
                             <label htmlFor="opacity">Opacity:</label>
                             {checkValidNumber(opacity) 
                                 ? isPropertyHasKeyframes(currentLayerKS.o) 
-                                    ? <input
-                                        type="range"
-                                        id="opacity"
-                                        min="0"
-                                        max="100"
-                                        value={opacity}
-                                        onChange={(e) => {
-                                            const newValue = parseInt(e.target.value, 10);
-                                            setOpacity(newValue);
-                                            handlePropertyChange('o', newValue);
-                                        }}
-                                    />
-                                    : <span>{opacity}%</span>
+                                    && <>
+                                        <input
+                                            type="range"
+                                            id="opacity"
+                                            min="0"
+                                            max="100"
+                                            value={opacity}
+                                            onChange={(e) => {
+                                                const newValue = parseInt(e.target.value, 10);
+                                                setOpacity(newValue);
+                                                handlePropertyChange('o', newValue);
+                                            }}
+                                        />
+                                        <span>{opacity}%</span>
+                                    </>
                                 : "--"
                             }
                         </div>
