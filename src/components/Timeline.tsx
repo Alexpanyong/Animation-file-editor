@@ -60,7 +60,7 @@ const Timeline: React.FC<{
         setScrubberPosition(newPosition);
 
         const progress = newPosition / timelineRect.width;
-        const currentFrame = Math.floor(progress * currentAnimation!.op); // calculate current frame (froma start from 1 instead of 0)
+        const currentFrame = Math.round(progress * currentAnimation!.op); // calculate current frame (froma start from 1 instead of 0)
         dispatch(updateScrubberPosition(currentFrame));
 
         const message: WebSocketMessage = {
@@ -96,10 +96,16 @@ const Timeline: React.FC<{
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
-                                className="keyframe absolute top-1/3 w-2 h-2 translate-x-2/4 -translate-y-2/4"
+                                className="keyframe absolute top-1/3 w-2 h-2 -translate-y-2/4"
                                 style={{ left: `${(keyframe?.t / currentAnimation!.op) * 100}%`}}
                             >
-                                <div className={`keyframe-dot ${layer.ind === currentLayer?.ind ? "bg-gray-100" : "bg-gray-400"} relative w-full h-full rounded-lg cursor-default`}></div>
+                                <div className={`keyframe-dot ${
+                                    layer.ind === currentLayer?.ind 
+                                        ? keyframe.t === currentFrame 
+                                        ? "bg-red-500 w-3 h-3 border-2 -translate-x-[20%] -translate-y-[20%]"  // when the currentFrame matches with the keyframe time
+                                            : "bg-gray-100" 
+                                        : "bg-gray-400"} 
+                                        relative w-full h-full rounded-lg cursor-default`}></div>
                                 {/* <input
                                     type="number"
                                     value={keyframe.s[0]}
@@ -228,7 +234,7 @@ const Timeline: React.FC<{
                                         <Draggable key={layer.ind} draggableId={layer.ind.toString()} index={index}>
                                             {(provided, snapshot) => (
                                                 <div
-                                                    className={`layer relative h-12 mb-1 px-4 py-2 text-xs cursor-default overflow-hidden ${
+                                                    className={`layer relative h-12 mb-1 px-4 py-2 text-xs cursor-default overflow-y-hidden ${
                                                         snapshot.isDragging
                                                         ? "bg-neutral-200" 
                                                         : layer.ind === currentLayer?.ind ? "bg-slate-400 text-white font-bold" : "bg-neutral-100"}`
