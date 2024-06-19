@@ -174,7 +174,6 @@ export const updateLayerProperty = createAsyncThunk(
         { getState, extra: ws }
     ) => {
         const state = getState() as RootState;
-        console.log("|||||||||||| layerIndex:", layerIndex);
 
         const newAnimation = update(state.animation.currentAnimation!, {
             layers: {
