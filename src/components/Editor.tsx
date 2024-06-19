@@ -61,7 +61,7 @@ const Editor: React.FC = () => {
 
     useEffect(() => {
         if (ws) {
-            (ws as WebSocket).onmessage = (event: MessageEvent) => {
+            ws.onmessage = (event: MessageEvent) => {
                 const message: { type: string, payload: any } = JSON.parse(event.data);
                 switch (message.type) {
                     case 'setAnimation':
@@ -93,6 +93,9 @@ const Editor: React.FC = () => {
                         break;
                     case 'propertyChange':
                         dispatch(updateLayerProperty(message.payload));
+                        break;
+                    case 'selectLayer':
+                        dispatch(selectLayer(message.payload));
                         break;
                     default:
                         console.log('Initiated Animation State:', message.type);

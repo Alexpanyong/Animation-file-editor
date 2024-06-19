@@ -194,11 +194,12 @@ const PropertiesPanel: React.FC = () => {
                     <div className="properties-content text-sm">
                         {/* Opacity */}
                         <div className="property-item">
-                            <label htmlFor="opacity">Opacity:</label>
+                            <label htmlFor="opacity" className="inline-block h-6">Opacity:</label>
                             {checkValidNumber(opacity) ? 
                                 // isPropertyHasKeyframes(currentLayerKS.o) &&   // TODO: Uncomment this line after adding opacity keyframes
                                     <>
                                         <input
+                                            className="relative -top-0.5 h-6"
                                             type="range"
                                             id="opacity"
                                             min="0"
@@ -212,17 +213,18 @@ const PropertiesPanel: React.FC = () => {
                                         />
                                         <span>{opacity}%</span>
                                     </>
-                                : "--"
+                                : <span className="inline-block h-6">--</span>
                             }
                         </div>
                         
                         {/* Position */}
                         <div>
                             <div className="property-item">
-                                <label htmlFor="positionX">Position X:</label>
+                                <label htmlFor="positionX" className="inline-block h-6">Position X:</label>
                                 {positionX !== null ?
                                     // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
                                         <input
+                                            className="relative -top-0.5"
                                             type="number"
                                             id="positionX"
                                             min="0"
@@ -234,15 +236,16 @@ const PropertiesPanel: React.FC = () => {
                                             }}
                                         />
                                         // : <span>{positionX}</span>   // TODO: Uncomment this line after adding position keyframes
-                                    : "--"
+                                    : <span className="inline-block h-6">--</span>
                                 }
                             </div>
                             
                             <div className="property-item">
-                                <label htmlFor="positionY">Position Y:</label>
+                                <label htmlFor="positionY" className="inline-block h-6">Position Y:</label>
                                 {positionY !== null ? 
                                     // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
                                         <input
+                                            className="relative -top-0.5"
                                             type="number"
                                             id="positionY"
                                             min="0"
@@ -254,15 +257,16 @@ const PropertiesPanel: React.FC = () => {
                                             }}
                                         />
                                         // : <span>{positionY}</span>   // TODO: Uncomment this line after adding position keyframes
-                                    : "--"
+                                    : <span className="inline-block h-6">--</span>
                                 }
                             </div>
                             
                             <div className="property-item">
-                                <label htmlFor="positionZ">Position Z:</label>
+                                <label htmlFor="positionZ" className="inline-block h-6">Position Z:</label>
                                 {positionZ !== null ? 
                                     // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
                                         <input
+                                            className="relative -top-0.5"
                                             type="number"
                                             id="positionZ"
                                             min="0"
@@ -274,7 +278,7 @@ const PropertiesPanel: React.FC = () => {
                                             }}
                                         />
                                         // : <span>{positionZ}</span>   // TODO: Uncomment this line after adding position keyframes
-                                    : "--"
+                                    : <span className="inline-block h-6">--</span>
                                 }
                             </div>
                         </div>
@@ -282,11 +286,12 @@ const PropertiesPanel: React.FC = () => {
                         {/* Scale */}
                         <div>
                             <div className="property-item">
-                                <label htmlFor="scaleX">Scale X:</label>
+                                <label htmlFor="scaleX" className="inline-block h-6">Scale X:</label>
                                 {scaleX !== null ? 
                                     <>
                                         {/* {isPropertyHasKeyframes(currentLayerKS.s) &&    // TODO: Uncomment this line after adding scale keyframes */}
                                         <input
+                                            className="relative -top-0.5 h-6"
                                             type="range"
                                             id="scaleX"
                                             min="0"
@@ -301,16 +306,17 @@ const PropertiesPanel: React.FC = () => {
                                         {/* }   // TODO: Uncomment this line after adding scale keyframes */}
                                         <span>{scaleX}%</span>
                                     </> 
-                                    : "--"
+                                    : <span className="inline-block h-6">--</span>
                                 }
                             </div>
                             
                             <div className="property-item">
-                                <label htmlFor="scaleY">Scale Y:</label>
+                                <label htmlFor="scaleY" className="inline-block h-6">Scale Y:</label>
                                 {scaleY !== null ? 
                                     <>
                                         {/* {isPropertyHasKeyframes(currentLayerKS.s) &&    // TODO: Uncomment this line after adding scale keyframes */}
                                         <input
+                                            className="relative -top-0.5 h-6"
                                             type="range"
                                             id="scaleY"
                                             min="0"
@@ -325,16 +331,17 @@ const PropertiesPanel: React.FC = () => {
                                         {/* }   // TODO: Uncomment this line after adding scale keyframes */}
                                         <span>{scaleY}%</span>
                                     </>
-                                    : "--"
+                                    : <span className="inline-block h-6">--</span>
                                 }
                             </div>
                             
                             <div className="property-item">
-                                <label htmlFor="scaleZ">Scale Z:</label>
+                                <label htmlFor="scaleZ" className="inline-block h-6">Scale Z:</label>
                                 {scaleZ !== null ? 
                                     <>
                                         {/* {isPropertyHasKeyframes(currentLayerKS.s) &&   // TODO: Uncomment this line after adding scale keyframes */}
                                         <input
+                                            className="relative -top-0.5 h-6"
                                             type="range"
                                             id="scaleZ"
                                             min="0"
@@ -349,17 +356,18 @@ const PropertiesPanel: React.FC = () => {
                                         {/* }   // TODO: Uncomment this line after adding scale keyframes */}
                                         <span>{scaleZ}%</span>
                                     </>
-                                    : "--"
+                                    : <span className="inline-block h-6">--</span>
                                 }
                             </div>
                         </div>
 
                         {/* Rotation */}
                         <div className="property-item">
-                            <label htmlFor="rotation">Rotation:</label>
+                            <label htmlFor="rotation" className="inline-block h-6">Rotation:</label>
                             {checkValidNumber(rotation) ? 
                                 // isPropertyHasKeyframes(currentLayerKS.r) ?   // TODO: Uncomment this line after adding rotation keyframes
                                     <input
+                                        className="relative -top-0.5"
                                         type="number"
                                         id="rotation"
                                         min="0"
@@ -371,7 +379,7 @@ const PropertiesPanel: React.FC = () => {
                                         }}
                                     /> 
                                     // : <span>{rotation}</span>   // TODO: Uncomment this line after adding rotation keyframes
-                                : "--"
+                                : <span className="inline-block h-6">--</span>
                             }
                         </div>
                     </div>

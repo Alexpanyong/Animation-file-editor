@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useContext } from 'react';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Animation, Layer, LayerChangeMessage, PropertyChangeMessage, Transformations } from '../types';
+import { Animation, Layer, LayerChangeMessage, PropertyChangeMessage } from '../types';
 import update from 'immutability-helper';
 import { RootState } from './store';
 
@@ -247,6 +246,16 @@ const animationSlice = createSlice({
         },
         selectLayer(state, action: PayloadAction<number | null>) {
             state.selectedLayerIndex = action.payload;
+
+            // Send WebSocket message
+            const ws = (action as any).meta?.arg?.extra;
+            if (ws) {
+                const message: LayerChangeMessage = {
+                    type: "selectLayer",
+                    payload: action.payload,
+                };
+                ws.send(JSON.stringify(message));
+            }
         },
         updateScrubberPosition: (state, action: PayloadAction<number>) => {
             state.currentFrame = action.payload;

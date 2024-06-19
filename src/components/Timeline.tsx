@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable, DragStart, DropResult } from 'react-beautiful-dnd';
 import { Layer, WebSocketMessage } from '../types';
 import { useAppDispatch, useAppSelector } from '../store/store';
@@ -38,9 +38,10 @@ const Timeline: React.FC<{
 
         dispatch(reorderLayers({ sourceIndex: result.source.index, destinationIndex: result.destination.index }));
         
-        // Update currentLayer after dragging
+        // Update selectedLayerIndex after dragging
         if (selectedLayerIndex !== null) {
-            dispatch(updateCurrentLayer(items[selectedLayerIndex]));
+            dispatch(selectLayer(result.destination.index)); // Update selectedLayerIndex
+            dispatch(updateCurrentLayer(items[result.destination.index]));
         }
     };
 
@@ -141,7 +142,7 @@ const Timeline: React.FC<{
         }
     };
 
-    const handleAddLayer = () => {
+    const handleAddLayer = useCallback(() => {
         // Generate a new unique layer ID
         const newLayer: Layer = {
             ddd: 0,
@@ -163,7 +164,7 @@ const Timeline: React.FC<{
             bm: 0,
         };
         dispatch(addLayer(newLayer) as any);
-    };
+    }, [currentAnimation, dispatch]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
