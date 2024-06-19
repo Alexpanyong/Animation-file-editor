@@ -17,6 +17,12 @@ wss.on('connection', (ws) => {
     clients.add(ws);
     console.log('Client connected');
 
+    // Send initial animation state to the new client
+    ws.send(JSON.stringify({
+        type: 'setAnimation',
+        payload: currentAnimationState
+    }));
+
     ws.on('message', (message) => {
         console.log('Received:', message);
 
@@ -70,10 +76,4 @@ wss.on('connection', (ws) => {
         clients.delete(ws);
         console.log('Client disconnected');
     });
-
-    // Send initial animation state to the new client
-    ws.send(JSON.stringify({
-        type: 'initialAnimationState',
-        payload: currentAnimationState
-    }));
 });

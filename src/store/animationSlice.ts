@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Animation, Layer, LayerChangeMessage, PropertyChangeMessage } from '../types';
+import { Animation, Layer, LayerChangeMessage, PropertyChangeMessage, WebSocketMessage } from '../types';
 import update from 'immutability-helper';
 import { RootState } from './store';
 
@@ -40,6 +40,13 @@ const initialState: AnimationState = {
     loadThrough: '',
     selectedLayerIndex: null,  // index of the array, layers.map((layer, index) => {...}), (start from 0)
 };
+
+function sendWebSocketMessage(ws: WebSocket, type: string, payload: any) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        const message: WebSocketMessage = { type, payload };
+        ws.send(JSON.stringify(message));
+    }
+}
 
 export const addLayer = createAsyncThunk<Animation, Layer, { state: RootState, extra: WebSocket }>(
     "animation/addLayer",
@@ -266,29 +273,13 @@ const animationSlice = createSlice({
     extraReducers(builder) {
         builder
             .addCase(addLayer.fulfilled, (state, action) => {
-                (state as any).currentAnimation = action.payload;
-
-                const ws = action.meta.arg.extra; // Get the ws object from extra
-                if (ws) {
-                    const message: LayerChangeMessage = {
-                        type: "layerAdded",
-                        payload: (action.payload as any),
-                    };
-                    ws.send(JSON.stringify(message));
-                }
+                state.currentAnimation = action.payload;
+                sendWebSocketMessage(action.meta.arg.extra, 'layerAdded', action.payload);
             })
             // ... add cases for removeLayer and reorderLayers
             .addCase(removeLayer.fulfilled, (state, action) => {
-                (state as any).currentAnimation = action.payload;
-
-                const ws = (action.meta.arg as any).extra; // Get the ws object from extra
-                if (ws) {
-                    const message: LayerChangeMessage = {
-                        type: 'layerDeleted',
-                        payload: ({ layerIndex: action.payload } as any),
-                    };
-                    ws.send(JSON.stringify(message));
-                }
+                state.currentAnimation = action.payload;
+                sendWebSocketMessage((action.meta.arg as any).extra, 'layerDeleted', action.payload);
             })
             .addCase(reorderLayers.fulfilled, (state, action) => {
                 const { sourceIndex, destinationIndex } = action.payload;
@@ -298,38 +289,15 @@ const animationSlice = createSlice({
                     newLayers.splice((destinationIndex as number), 0, removed);
                     state.currentAnimation.layers = newLayers;
                 }
-
-                const ws = (action.meta.arg as any).extra;
-                if (ws) {
-                    const message: LayerChangeMessage = {
-                        type: 'layerReordered',
-                        payload: (action.payload as any),
-                    };
-                    ws.send(JSON.stringify(message));
-                }
+                sendWebSocketMessage((action.meta.arg as any).extra, 'layerReordered', action.payload);
             })
             .addCase(updateKeyframeValue.fulfilled, (state, action) => {
                 state.currentAnimation = action.payload;
-                const ws = action.meta.arg.extra;
-                if (ws) {
-                    const message: PropertyChangeMessage = {
-                        type: 'propertyChange',
-                        payload: (action.payload as any),
-                    };
-                    ws.send(JSON.stringify(message));
-                }
+                sendWebSocketMessage(action.meta.arg.extra, 'propertyChange', action.payload);
             })
             .addCase(updateLayerProperty.fulfilled, (state, action) => {
                 state.currentAnimation = action.payload as any;
-                const ws = action.meta.arg.extra;
-                if (ws) {
-                    const message: PropertyChangeMessage = {
-                        type: 'propertyChange',
-                        payload: (action.payload as any),
-                        timestamp: Date.now(),
-                    };
-                    ws.send(JSON.stringify(message));
-                }
+                sendWebSocketMessage(action.meta.arg.extra, 'propertyChange', action.payload);
             });
     },
 });
