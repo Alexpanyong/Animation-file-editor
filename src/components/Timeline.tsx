@@ -208,7 +208,11 @@ const Timeline: React.FC<{
                         <div className="timeline-header inline-block mr-6 mb-6 text-2xl font-bold text-slate-500">Timeline</div>
                         <button className="px-2 py-1 mt-1 mr-4 text-sm border border-slate-400 rounded-lg" onClick={handleAddLayer}>Add Layer</button>
                         <div className="current-layer inline-block mr-4 text-lg font-bold">
-                            <span className="text-sm font-normal">Current layer:</span> {currentLayer !== null ? `${currentLayer.ind} - ${currentAnimation?.layers[(selectedLayerIndex as number)]?.nm}` : '--'}
+                            <span className="text-sm font-normal">Current layer:</span> {
+                                currentAnimation?.layers.length! > 0 && currentLayer !== null 
+                                    ? `${currentLayer?.ind} - ${currentAnimation?.layers[selectedLayerIndex]?.nm}` 
+                                    : '--'
+                                }
                         </div>
                         <div className="current-frame inline-block mr-4 text-lg font-bold">
                             <span className="text-sm font-normal">Current frame:</span> <span className="text-red-500">{currentFrame}</span>
