@@ -226,7 +226,7 @@ const animationSlice = createSlice({
         },
         selectLayer(state, action: PayloadAction<number | null>) {
             state.selectedLayerIndex = action.payload;
-            sendWebSocketMessage((action as any).meta.arg.extra, 'selectLayer', action.payload);
+            sendWebSocketMessage((action as any).meta?.arg?.extra, 'selectLayer', action.payload);
         },
         updateScrubberPosition: (state, action: PayloadAction<number>) => {
             state.currentFrame = action.payload;
