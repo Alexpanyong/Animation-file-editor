@@ -81,9 +81,11 @@ const Timeline: React.FC<{
     const renderKeyframes = (layer: any) => {
         const ks = layer.ks || null;
         let keyframes: any[] = [];
+        let propertyName: string = "";  // put the property name over the keyframe dot (o, p, s, r, etc.)
         for (const key in ks) {
             if (!ks[key]?.k) continue;
             if (!Array.isArray(ks[key]?.k[0]) && typeof ks[key]?.k[0] === "object") {  // check if it is an array of object (has keyframes)
+                propertyName = key;
                 for (let i = 0; i < ks[key]?.k.length; i++) {
                     keyframes.push(ks[key]?.k[i]);
                 }
@@ -99,24 +101,17 @@ const Timeline: React.FC<{
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
-                                className="keyframe absolute top-1/3 w-2 h-2 -translate-y-2/4"
+                                className="keyframe absolute top-2/4 w-2 h-2 -translate-y-2/4"
                                 style={{ left: `${(keyframe?.t / currentAnimation!.op) * 100}%`}}
                             >
-                                <div className={`keyframe-dot ${
+                                <div className={`keyframe-dot relative w-full h-full rounded-lg cursor-default ${
                                     layer.ind === currentLayer?.ind 
                                         ? parseInt(keyframe.t, 10) === currentFrame 
-                                            ? "bg-gray-500 w-4 h-4 border-2 -translate-x-[25%] -translate-y-[25%]"  // when the currentFrame matches with the keyframe time
+                                        ? "bg-gray-500 !w-3 !h-3 border-2 -translate-x-[20%] -translate-y-[20%]"  // when the currentFrame matches with the keyframe time
                                             : "bg-gray-100" 
                                         : "bg-gray-400"} 
-                                        relative w-full h-full rounded-lg cursor-default`}></div>
-                                {/* <input
-                                    type="number"
-                                    value={keyframe.s[0]}
-                                    onChange={(e) => {
-                                        const newValue = parseFloat(e.target.value);
-                                        dispatch(updateKeyframeValue({ layerIndex, keyframeIndex: index, newValue }));
-                                    }}
-                                /> */}
+                                `}></div>
+                                <div className="absolute w-2 -top-[1.1rem] text-center">{propertyName}</div>
                             </div>
                         )}
                     </Draggable>
@@ -213,7 +208,11 @@ const Timeline: React.FC<{
                         <div className="timeline-header inline-block mr-6 mb-6 text-2xl font-bold text-slate-500">Timeline</div>
                         <button className="px-2 py-1 mt-1 mr-4 text-sm border border-slate-400 rounded-lg" onClick={handleAddLayer}>Add Layer</button>
                         <div className="current-layer inline-block mr-4 text-lg font-bold">
-                            <span className="text-sm font-normal">Current layer:</span> {currentLayer !== null ? `${currentLayer.ind} - ${currentAnimation?.layers[(selectedLayerIndex as number)]?.nm}` : '--'}
+                            <span className="text-sm font-normal">Current layer:</span> {
+                                currentAnimation?.layers.length! > 0 && currentLayer !== null 
+                                    ? `${currentLayer?.ind} - ${currentAnimation?.layers[selectedLayerIndex]?.nm}` 
+                                    : '--'
+                                }
                         </div>
                         <div className="current-frame inline-block mr-4 text-lg font-bold">
                             <span className="text-sm font-normal">Current frame:</span> <span className="text-red-500">{currentFrame}</span>
@@ -231,7 +230,7 @@ const Timeline: React.FC<{
                                         <Draggable key={layer.ind} draggableId={layer.ind.toString()} index={index}>
                                             {(provided, snapshot) => (
                                                 <div
-                                                    className={`layer relative h-12 mb-1 px-4 py-2 text-xs cursor-default overflow-y-hidden ${
+                                                    className={`layer relative h-12 mb-1 px-3 py-0.5 text-xs cursor-default overflow-y-hidden ${
                                                         snapshot.isDragging
                                                         ? "bg-neutral-200" 
                                                         : layer.ind === currentLayer?.ind ? "bg-slate-400 text-white font-bold" : "bg-neutral-100"}`
@@ -243,8 +242,8 @@ const Timeline: React.FC<{
                                                 >
                                                     <div>{layer.ind} - {layer.nm}</div>
                                                     {currentLayer !== null && renderKeyframes(layer)}
-                                                    <div className="absolute top-2 right-4">
-                                                        <button onClick={(e) => handleDeleteLayer(index, e)} className="delete-button">
+                                                    <div className="absolute top-0.5 right-3">
+                                                        <button onClick={(e) => handleDeleteLayer(index, e)} className="delete-button hover:underline hover:underline-offset-1">
                                                             Delete
                                                         </button>
                                                     </div>
