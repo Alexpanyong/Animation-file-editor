@@ -50,7 +50,7 @@ input[type="range"] {
 .app-container {
     position: relative;
     min-width: 850px;
-    max-width: 100%;
+    max-width: 1000px;
     width: 100%;
     height: 100%;
     color: rgb(100 116 139);
@@ -61,7 +61,7 @@ input[type="range"] {
 
 .editor-container {
     position: relative;
-    max-width: 100%;
+    max-width: 1000px;
     max-height: 100%;
     padding: 20px;
 }

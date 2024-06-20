@@ -23,6 +23,9 @@ const Timeline: React.FC<{
     const currentLayer: any = useAppSelector((state) => state.animation.currentLayer);
     const selectedLayerIndex = useAppSelector((state) => state.animation.selectedLayerIndex);
 
+    // find the index of the selected layer from the current animation
+    const layerIndex = currentAnimation?.layers.findIndex((layer) => layer.ind === currentLayer?.ind);  // index of the array layers[] (start from 0)
+
     const handleOnDragStart = (start: DragStart) => {
         const layerIndex = parseInt(start.draggableId);
         setDraggingLayerIndex(layerIndex);
@@ -101,8 +104,8 @@ const Timeline: React.FC<{
                             >
                                 <div className={`keyframe-dot ${
                                     layer.ind === currentLayer?.ind 
-                                        ? keyframe.t === currentFrame 
-                                        ? "bg-red-500 w-3 h-3 border-2 -translate-x-[20%] -translate-y-[20%]"  // when the currentFrame matches with the keyframe time
+                                        ? parseInt(keyframe.t, 10) === currentFrame 
+                                            ? "bg-gray-500 w-4 h-4 border-2 -translate-x-[25%] -translate-y-[25%]"  // when the currentFrame matches with the keyframe time
                                             : "bg-gray-100" 
                                         : "bg-gray-400"} 
                                         relative w-full h-full rounded-lg cursor-default`}></div>
@@ -111,13 +114,7 @@ const Timeline: React.FC<{
                                     value={keyframe.s[0]}
                                     onChange={(e) => {
                                         const newValue = parseFloat(e.target.value);
-                                        dispatch(
-                                            updateKeyframeValue({
-                                                layerIndex: layer.ind,
-                                                keyframeIndex: index,
-                                                newValue,
-                                            })
-                                        );
+                                        dispatch(updateKeyframeValue({ layerIndex, keyframeIndex: index, newValue }));
                                     }}
                                 /> */}
                             </div>

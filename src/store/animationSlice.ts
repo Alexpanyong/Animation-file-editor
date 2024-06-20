@@ -15,10 +15,10 @@ interface AnimationState {
 }
 
 interface UpdateKeyframeValuePayload {
-    layerIndex: number;
-    keyframeIndex: number;
-    newValue: number;
-    propertyName: string;
+    layerIndex: number | any;
+    keyframeIndex: number | any;
+    newValue: number | any;
+    propertyName?: string | any;
     extra?: any;
 }
 
