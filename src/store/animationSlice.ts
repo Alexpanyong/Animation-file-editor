@@ -1,35 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Animation, Layer, LayerChangeMessage, PropertyChangeMessage, WebSocketMessage } from '../types';
+import { Animation, AnimationState, Layer, LayerChangeMessage, PropertyChangeMessage, UpdateKeyframeValuePayload, UpdateLayerPropertyPayload, WebSocketMessage } from '../types';
 import update from 'immutability-helper';
 import { RootState } from './store';
 
-interface AnimationState {
-    animationID: string;
-    animationName?: string;
-    currentAnimation: Animation | null;
-    currentFrame: number;
-    currentLayer: Layer | null;
-    loadThrough: string;
-    selectedLayerIndex?: number | null;
-}
-
-interface UpdateKeyframeValuePayload {
-    layerIndex: number;
-    keyframeIndex: number;
-    newValue: number;
-    propertyName: string;
-    extra?: any;
-}
-
-interface UpdateLayerPropertyPayload {
-    layerIndex: number | any;
-    propertyName: string;
-    newValue: number | number[];
-    currentFrame: number | undefined;
-    index?: number;
-    extra?: any;
-}
 
 const initialState: AnimationState = {
     animationID: '',
@@ -252,16 +226,7 @@ const animationSlice = createSlice({
         },
         selectLayer(state, action: PayloadAction<number | null>) {
             state.selectedLayerIndex = action.payload;
-
-            // Send WebSocket message
-            const ws = (action as any).meta?.arg?.extra;
-            if (ws) {
-                const message: LayerChangeMessage = {
-                    type: "selectLayer",
-                    payload: action.payload,
-                };
-                ws.send(JSON.stringify(message));
-            }
+            sendWebSocketMessage((action as any).meta?.arg?.extra, 'selectLayer', action.payload);
         },
         updateScrubberPosition: (state, action: PayloadAction<number>) => {
             state.currentFrame = action.payload;

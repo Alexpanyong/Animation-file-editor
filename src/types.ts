@@ -120,3 +120,31 @@ export interface LayerChangeMessage extends WebSocketMessage {
         layer?: Layer | any;
     } | number | null;
 }
+
+
+export interface AnimationState {
+    animationID: string;
+    animationName?: string;
+    currentAnimation: Animation | null;
+    currentFrame: number;
+    currentLayer: Layer | null;
+    loadThrough: string;
+    selectedLayerIndex?: number | null;
+}
+
+export interface UpdateKeyframeValuePayload {
+    layerIndex: number | any;
+    keyframeIndex: number | any;
+    newValue: number | any;
+    propertyName?: string | any;
+    extra?: any;
+}
+
+export interface UpdateLayerPropertyPayload {
+    layerIndex: number | any;
+    propertyName: string;
+    newValue: number | number[];
+    currentFrame: number | undefined;
+    index?: number;
+    extra?: any;
+}

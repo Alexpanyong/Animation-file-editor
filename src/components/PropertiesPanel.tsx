@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Layer, PropertyChangeMessage } from '../types';
 import { useAppDispatch, useAppSelector } from '../store/store';
-import { updateLayerProperty } from '../store/animationSlice';
+import { updateKeyframeValue, updateLayerProperty } from '../store/animationSlice';
 import { WebSocketContext } from '../WebSocketProvider';
 
 const PropertiesPanel: React.FC = () => {
@@ -11,6 +11,9 @@ const PropertiesPanel: React.FC = () => {
     const currentLayer: Layer | any = useAppSelector((state) => state.animation.currentLayer);
     const selectedLayerIndex = useAppSelector((state) => state.animation.selectedLayerIndex);
     const currentLayerKS = currentLayer?.ks;
+
+    // find the index of the selected layer from the current animation
+    const layerIndex = currentAnimation?.layers.findIndex((layer: Layer) => layer.ind === currentLayer.ind);
 
     const ws = useContext(WebSocketContext);
 
@@ -130,9 +133,6 @@ const PropertiesPanel: React.FC = () => {
 
 
     const handlePropertyChange = (propertyName: string, newValue: number, index?: number, currentFrame?: number,) => {
-        // find the index of the selected layer from the current animation
-        const layerIndex = currentAnimation?.layers.findIndex((layer: Layer) => layer.ind === currentLayer.ind);
-        
         if (currentLayer !== null) {
             if (typeof currentLayerKS?.[propertyName]?.k[0] === 'number') {
                 // An array of numbers
@@ -170,6 +170,43 @@ const PropertiesPanel: React.FC = () => {
         return Array.isArray(property?.k) && property?.k.length > 0 && typeof property?.k[0] === 'object';
     }
 
+    const renderPropertyInputField = (
+        classNameAddon: string | undefined = undefined,  // additional class name
+        layerIndex: number | undefined,  // index of currentAnimation.layers[] (start from 0)
+        imputID: string,  // id of the input field
+        inputType: string,  // type of the input field
+        minValue: string | undefined = undefined,  // min value of the input field
+        maxValue: string | undefined = undefined,  // max value of the input field
+        inputValue: string,  // displayed value of the input field
+        propertyName: string,  // property name
+        setNewValueToState: any,  // set new value to state (useState hook)
+        propertyValueIndex: number | undefined = 0  // index of the property value (0 for X, 1 for Y, 2 for Z)
+        
+    ) => {
+        return (
+            <input
+                className={`relative -top-0.5 ${classNameAddon}`}
+                type={inputType}
+                id={imputID}
+                min={minValue}
+                max={maxValue}
+                value={inputValue}
+                onChange={(e) => {
+                    const newValue = parseFloat(e.target.value);
+                    setNewValueToState(newValue);
+                    if (parseInt(currentLayerKS?.[propertyName]?.k?.t, 10) === currentFrame) {  // When current frame is a keyframe
+                        const keyframeIndex = currentLayerKS?.[propertyName]?.k.findIndex((kf: any) => kf.t === currentFrame);
+                        if (keyframeIndex !== -1) {  // Keyframe found at the current frame
+                            dispatch(updateKeyframeValue({ layerIndex, keyframeIndex, newValue, propertyName }));
+                        }
+                    } else {
+                        handlePropertyChange(propertyName, newValue, propertyValueIndex, currentFrame);
+                    }
+                }}
+            />
+        );
+    };
+
     return (
         <div className="properties-panel p-4 pt-0 ml-4">
             {currentLayer !== null && (
@@ -184,19 +221,7 @@ const PropertiesPanel: React.FC = () => {
                             {checkValidNumber(opacity) ? 
                                 // isPropertyHasKeyframes(currentLayerKS.o) &&   // TODO: Uncomment this line after adding opacity keyframes
                                     <>
-                                        <input
-                                            className="relative -top-0.5 h-6"
-                                            type="range"
-                                            id="opacity"
-                                            min="0"
-                                            max="100"
-                                            value={opacity}
-                                            onChange={(e) => {
-                                                const newValue = parseInt(e.target.value, 10);
-                                                setOpacity(newValue);
-                                                handlePropertyChange('o', newValue);
-                                            }}
-                                        />
+                                        {renderPropertyInputField("h-6", layerIndex, "opacity", "range", "0", "100", opacity, "o", setOpacity)}
                                         <span>{opacity}%</span>
                                     </>
                                 : <span className="inline-block h-6">--</span>
@@ -209,18 +234,7 @@ const PropertiesPanel: React.FC = () => {
                                 <label htmlFor="positionX" className="inline-block h-6">Position X:</label>
                                 {positionX !== null ?
                                     // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
-                                        <input
-                                            className="relative -top-0.5"
-                                            type="number"
-                                            id="positionX"
-                                            min="0"
-                                            value={positionX}
-                                            onChange={(e) => {
-                                                const newValue = parseFloat(e.target.value);
-                                                setPositionX(newValue);
-                                                handlePropertyChange('p', newValue, 0, currentFrame);
-                                            }}
-                                        />
+                                        renderPropertyInputField("", layerIndex, "positionX", "number", "0", undefined, positionX, "p", setPositionX, 0)
                                         // : <span>{positionX}</span>   // TODO: Uncomment this line after adding position keyframes
                                     : <span className="inline-block h-6">--</span>
                                 }
@@ -230,18 +244,7 @@ const PropertiesPanel: React.FC = () => {
                                 <label htmlFor="positionY" className="inline-block h-6">Position Y:</label>
                                 {positionY !== null ? 
                                     // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
-                                        <input
-                                            className="relative -top-0.5"
-                                            type="number"
-                                            id="positionY"
-                                            min="0"
-                                            value={positionY}
-                                            onChange={(e) => {
-                                                const newValue = parseFloat(e.target.value);
-                                                setPositionY(newValue);
-                                                handlePropertyChange('p', newValue, 1, currentFrame);
-                                            }}
-                                        />
+                                        renderPropertyInputField("", layerIndex, "positionY", "number", "0", undefined, positionY, "p", setPositionY, 1)
                                         // : <span>{positionY}</span>   // TODO: Uncomment this line after adding position keyframes
                                     : <span className="inline-block h-6">--</span>
                                 }
@@ -251,18 +254,7 @@ const PropertiesPanel: React.FC = () => {
                                 <label htmlFor="positionZ" className="inline-block h-6">Position Z:</label>
                                 {positionZ !== null ? 
                                     // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
-                                        <input
-                                            className="relative -top-0.5"
-                                            type="number"
-                                            id="positionZ"
-                                            min="0"
-                                            value={positionZ}
-                                            onChange={(e) => {
-                                                const newValue = parseFloat(e.target.value);
-                                                setPositionZ(newValue);
-                                                handlePropertyChange('p', newValue, 2, currentFrame);
-                                            }}
-                                        />
+                                        renderPropertyInputField("", layerIndex, "positionZ", "number", "0", undefined, positionZ, "p", setPositionZ, 2)
                                         // : <span>{positionZ}</span>   // TODO: Uncomment this line after adding position keyframes
                                     : <span className="inline-block h-6">--</span>
                                 }
@@ -276,19 +268,7 @@ const PropertiesPanel: React.FC = () => {
                                 {scaleX !== null ? 
                                     <>
                                         {/* {isPropertyHasKeyframes(currentLayerKS.s) &&    // TODO: Uncomment this line after adding scale keyframes */}
-                                        <input
-                                            className="relative -top-0.5 h-6"
-                                            type="range"
-                                            id="scaleX"
-                                            min="0"
-                                            max="200" // Allow scaling up to 200%
-                                            value={scaleX}
-                                            onChange={(e) => {
-                                                const newValue = parseFloat(e.target.value);
-                                                setScaleX(newValue);
-                                                handlePropertyChange('s', newValue, 0, currentFrame);
-                                            }}
-                                        />
+                                        {renderPropertyInputField("h-6", layerIndex, "scaleX", "range", "0", "200", scaleX, "s", setScaleX, 0)}
                                         {/* }   // TODO: Uncomment this line after adding scale keyframes */}
                                         <span>{scaleX}%</span>
                                     </> 
@@ -301,19 +281,7 @@ const PropertiesPanel: React.FC = () => {
                                 {scaleY !== null ? 
                                     <>
                                         {/* {isPropertyHasKeyframes(currentLayerKS.s) &&    // TODO: Uncomment this line after adding scale keyframes */}
-                                        <input
-                                            className="relative -top-0.5 h-6"
-                                            type="range"
-                                            id="scaleY"
-                                            min="0"
-                                            max="200"
-                                            value={scaleY}
-                                            onChange={(e) => {
-                                                const newValue = parseFloat(e.target.value);
-                                                setScaleY(newValue);
-                                                handlePropertyChange('s', newValue, 1, currentFrame);
-                                            }}
-                                        />
+                                        {renderPropertyInputField("h-6", layerIndex, "scaleY", "range", "0", "200", scaleY, "s", setScaleY, 1)}
                                         {/* }   // TODO: Uncomment this line after adding scale keyframes */}
                                         <span>{scaleY}%</span>
                                     </>
@@ -326,19 +294,7 @@ const PropertiesPanel: React.FC = () => {
                                 {scaleZ !== null ? 
                                     <>
                                         {/* {isPropertyHasKeyframes(currentLayerKS.s) &&   // TODO: Uncomment this line after adding scale keyframes */}
-                                        <input
-                                            className="relative -top-0.5 h-6"
-                                            type="range"
-                                            id="scaleZ"
-                                            min="0"
-                                            max="200"
-                                            value={scaleZ}
-                                            onChange={(e) => {
-                                                const newValue = parseFloat(e.target.value);
-                                                setScaleZ(newValue);
-                                                handlePropertyChange('s', newValue, 2, currentFrame);
-                                            }}
-                                        />
+                                        {renderPropertyInputField("h-6", layerIndex, "scaleZ", "range", "0", "200", scaleZ, "s", setScaleZ, 2)}
                                         {/* }   // TODO: Uncomment this line after adding scale keyframes */}
                                         <span>{scaleZ}%</span>
                                     </>
@@ -352,18 +308,7 @@ const PropertiesPanel: React.FC = () => {
                             <label htmlFor="rotation" className="inline-block h-6">Rotation:</label>
                             {checkValidNumber(rotation) ? 
                                 // isPropertyHasKeyframes(currentLayerKS.r) ?   // TODO: Uncomment this line after adding rotation keyframes
-                                    <input
-                                        className="relative -top-0.5"
-                                        type="number"
-                                        id="rotation"
-                                        min="0"
-                                        value={rotation}
-                                        onChange={(e) => {
-                                            const newValue = parseFloat(e.target.value);
-                                            setRotation(newValue);
-                                            handlePropertyChange('r', newValue);
-                                        }}
-                                    /> 
+                                    renderPropertyInputField("", layerIndex, "rotation", "number", "0", undefined, rotation, "r", setRotation)
                                     // : <span>{rotation}</span>   // TODO: Uncomment this line after adding rotation keyframes
                                 : <span className="inline-block h-6">--</span>
                             }

@@ -69,7 +69,7 @@ const ApiFetchLoader: React.FC = () => {
     return (
         <>
             <div className="api-fetch-container flex my-2">
-                <div className="mt-1 mr-2">{`Or, you may fetch the animation JSON by ID (e.g 25, 43, 2615): `}</div>
+                <div className="mt-1 mr-2">{`Or, fetch the animation JSON by ID (e.g 25, 43, 2615): `}</div>
                 <div className="flex-5">
                     <input className="px-2 py-1.5 mr-4 text-sm" type="number" accept=".json" onChange={handleIdChange} />
                 </div>
