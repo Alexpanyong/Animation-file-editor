@@ -238,7 +238,7 @@ const PropertiesPanel: React.FC = () => {
                                         {/* {renderPropertyInputField("h-6", layerIndex, "opacity", "range", "0", "100", opacity, "o", setOpacity)} */}
                                         <span>{opacity}%</span>
                                     </>
-                                : <span>--</span>
+                                : <span className="h-[35px] leading-9">--</span>
                             }
                         </div>
 
@@ -248,7 +248,7 @@ const PropertiesPanel: React.FC = () => {
                             {/* Position */}
                             <div className="inline-block">
                                 <div className="property-item flex items-center">
-                                    <label htmlFor="positionX">Position X:</label>
+                                    <label htmlFor="positionX" className="min-w-[70px]">Position X:</label>
                                     {positionX !== null ?
                                         // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
                                             <TextField
@@ -267,12 +267,12 @@ const PropertiesPanel: React.FC = () => {
                                             />
                                             // renderPropertyInputField("", layerIndex, "positionX", "number", "0", undefined, positionX, "p", setPositionX, 0)
                                             // : <span>{positionX}</span>   // TODO: Uncomment this line after adding position keyframes
-                                        : <span>--</span>
+                                        : <span className="h-[35px] leading-9">--</span>
                                     }
                                 </div>
                                 
                                 <div className="property-item flex items-center">
-                                    <label htmlFor="positionY">Position Y:</label>
+                                    <label htmlFor="positionY" className="min-w-[70px]">Position Y:</label>
                                     {positionY !== null ? 
                                         // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
                                             <TextField
@@ -291,12 +291,12 @@ const PropertiesPanel: React.FC = () => {
                                             />
                                             // renderPropertyInputField("", layerIndex, "positionY", "number", "0", undefined, positionY, "p", setPositionY, 1)
                                             // : <span>{positionY}</span>   // TODO: Uncomment this line after adding position keyframes
-                                        : <span>--</span>
+                                        : <span className="h-[35px] leading-9">--</span>
                                     }
                                 </div>
                                 
                                 <div className="property-item flex items-center">
-                                    <label htmlFor="positionZ">Position Z:</label>
+                                    <label htmlFor="positionZ" className="min-w-[70px]">Position Z:</label>
                                     {positionZ !== null ? 
                                         // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
                                             <TextField
@@ -315,7 +315,7 @@ const PropertiesPanel: React.FC = () => {
                                             />
                                             // renderPropertyInputField("", layerIndex, "positionZ", "number", "0", undefined, positionZ, "p", setPositionZ, 2)
                                             // : <span>{positionZ}</span>   // TODO: Uncomment this line after adding position keyframes
-                                        : <span>--</span>
+                                        : <span className="h-[35px] leading-9">--</span>
                                     }
                                 </div>
                             </div>
@@ -323,7 +323,7 @@ const PropertiesPanel: React.FC = () => {
                             {/* Scale */}
                             <div className="inline-block">
                                 <div className="property-item flex items-center">
-                                    <label htmlFor="scaleX">Scale X:</label>
+                                    <label htmlFor="scaleX" className="min-w-[52px]">Scale X:</label>
                                     {scaleX !== null ? 
                                         <>
                                             {/* {isPropertyHasKeyframes(currentLayerKS.s) &&    // TODO: Uncomment this line after adding scale keyframes */}
@@ -344,12 +344,12 @@ const PropertiesPanel: React.FC = () => {
                                             {/* }   // TODO: Uncomment this line after adding scale keyframes */}
                                             <span>{scaleX}%</span>
                                         </> 
-                                        : <span>--</span>
+                                        : <span className="h-[35px] leading-9">--</span>
                                     }
                                 </div>
                                 
                                 <div className="property-item flex items-center">
-                                    <label htmlFor="scaleY">Scale Y:</label>
+                                    <label htmlFor="scaleY" className="min-w-[52px]">Scale Y:</label>
                                     {scaleY !== null ? 
                                         <>
                                             {/* {isPropertyHasKeyframes(currentLayerKS.s) &&    // TODO: Uncomment this line after adding scale keyframes */}
@@ -370,12 +370,12 @@ const PropertiesPanel: React.FC = () => {
                                             {/* }   // TODO: Uncomment this line after adding scale keyframes */}
                                             <span>{scaleY}%</span>
                                         </>
-                                        : <span>--</span>
+                                        : <span className="h-[35px] leading-9">--</span>
                                     }
                                 </div>
                                 
                                 <div className="property-item flex items-center">
-                                    <label htmlFor="scaleZ">Scale Z:</label>
+                                    <label htmlFor="scaleZ" className="min-w-[52px]">Scale Z:</label>
                                     {scaleZ !== null ? 
                                         <>
                                             {/* {isPropertyHasKeyframes(currentLayerKS.s) &&   // TODO: Uncomment this line after adding scale keyframes */}
@@ -396,7 +396,7 @@ const PropertiesPanel: React.FC = () => {
                                             {/* }   // TODO: Uncomment this line after adding scale keyframes */}
                                             <span>{scaleZ}%</span>
                                         </>
-                                        : <span>--</span>
+                                        : <span className="h-[35px] leading-9">--</span>
                                     }
                                 </div>
                             </div>
@@ -425,7 +425,7 @@ const PropertiesPanel: React.FC = () => {
                                 />
                                     // renderPropertyInputField("", layerIndex, "rotation", "number", "0", undefined, rotation, "r", setRotation)
                                     // : <span>{rotation}</span>   // TODO: Uncomment this line after adding rotation keyframes
-                                : <span>--</span>
+                                : <span className="h-[35px] leading-9">--</span>
                             }
                         </div>
                     </div>
