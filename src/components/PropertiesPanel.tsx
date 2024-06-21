@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { Slider, TextField, Box } from '@mui/material';
 import { Layer, PropertyChangeMessage } from '../types';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { updateKeyframeValue, updateLayerProperty } from '../store/animationSlice';
@@ -216,101 +217,215 @@ const PropertiesPanel: React.FC = () => {
                     </div>
                     <div className="properties-content text-sm">
                         {/* Opacity */}
-                        <div className="property-item">
-                            <label htmlFor="opacity" className="inline-block h-6">Opacity:</label>
+                        <div className="property-item flex items-center">
+                            <label htmlFor="opacity">Opacity:</label>
                             {checkValidNumber(opacity) ? 
                                 // isPropertyHasKeyframes(currentLayerKS.o) &&   // TODO: Uncomment this line after adding opacity keyframes
                                     <>
-                                        {renderPropertyInputField("h-6", layerIndex, "opacity", "range", "0", "100", opacity, "o", setOpacity)}
+                                        <Box sx={{ width: 150, display: "inline-block", verticalAlign: "middle", marginLeft: "6px", marginRight: "14px" }}>
+                                            <Slider
+                                                id="opacity"
+                                                value={opacity}
+                                                min={0}
+                                                max={100}
+                                                onChange={(e, newValue) => {
+                                                    setOpacity(newValue as number);
+                                                    handlePropertyChange('o', (newValue as number));
+                                                }}
+                                                valueLabelDisplay="off"
+                                            />
+                                        </Box>
+                                        {/* {renderPropertyInputField("h-6", layerIndex, "opacity", "range", "0", "100", opacity, "o", setOpacity)} */}
                                         <span>{opacity}%</span>
                                     </>
-                                : <span className="inline-block h-6">--</span>
+                                : <span>--</span>
                             }
                         </div>
+
+                        <div className="dividing-line my-2 px-2 border-t-2 border-slate-200 border-dashed"></div>
                         
-                        {/* Position */}
-                        <div>
-                            <div className="property-item">
-                                <label htmlFor="positionX" className="inline-block h-6">Position X:</label>
-                                {positionX !== null ?
-                                    // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
-                                        renderPropertyInputField("", layerIndex, "positionX", "number", "0", undefined, positionX, "p", setPositionX, 0)
-                                        // : <span>{positionX}</span>   // TODO: Uncomment this line after adding position keyframes
-                                    : <span className="inline-block h-6">--</span>
-                                }
+                        <div className="flex items-start">
+                            {/* Position */}
+                            <div className="inline-block">
+                                <div className="property-item flex items-center">
+                                    <label htmlFor="positionX">Position X:</label>
+                                    {positionX !== null ?
+                                        // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
+                                            <TextField
+                                                id="positionX"
+                                                label=""
+                                                type="number"
+                                                value={positionX}
+                                                onChange={(e) => {
+                                                    const newValue = parseFloat(e.target.value);
+                                                    setPositionX(newValue);
+                                                    handlePropertyChange('p', newValue, 0, currentFrame);
+                                                }}
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                            />
+                                            // renderPropertyInputField("", layerIndex, "positionX", "number", "0", undefined, positionX, "p", setPositionX, 0)
+                                            // : <span>{positionX}</span>   // TODO: Uncomment this line after adding position keyframes
+                                        : <span>--</span>
+                                    }
+                                </div>
+                                
+                                <div className="property-item flex items-center">
+                                    <label htmlFor="positionY">Position Y:</label>
+                                    {positionY !== null ? 
+                                        // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
+                                            <TextField
+                                                id="positionY"
+                                                label=""
+                                                type="number"
+                                                value={positionY}
+                                                onChange={(e) => {
+                                                    const newValue = parseFloat(e.target.value);
+                                                    setPositionY(newValue);
+                                                    handlePropertyChange('p', newValue, 1, currentFrame);
+                                                }}
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                            />
+                                            // renderPropertyInputField("", layerIndex, "positionY", "number", "0", undefined, positionY, "p", setPositionY, 1)
+                                            // : <span>{positionY}</span>   // TODO: Uncomment this line after adding position keyframes
+                                        : <span>--</span>
+                                    }
+                                </div>
+                                
+                                <div className="property-item flex items-center">
+                                    <label htmlFor="positionZ">Position Z:</label>
+                                    {positionZ !== null ? 
+                                        // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
+                                            <TextField
+                                                id="positionZ"
+                                                label=""
+                                                type="number"
+                                                value={positionZ}
+                                                onChange={(e) => {
+                                                    const newValue = parseFloat(e.target.value);
+                                                    setPositionZ(newValue);
+                                                    handlePropertyChange('p', newValue, 2, currentFrame);
+                                                }}
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                            />
+                                            // renderPropertyInputField("", layerIndex, "positionZ", "number", "0", undefined, positionZ, "p", setPositionZ, 2)
+                                            // : <span>{positionZ}</span>   // TODO: Uncomment this line after adding position keyframes
+                                        : <span>--</span>
+                                    }
+                                </div>
                             </div>
-                            
-                            <div className="property-item">
-                                <label htmlFor="positionY" className="inline-block h-6">Position Y:</label>
-                                {positionY !== null ? 
-                                    // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
-                                        renderPropertyInputField("", layerIndex, "positionY", "number", "0", undefined, positionY, "p", setPositionY, 1)
-                                        // : <span>{positionY}</span>   // TODO: Uncomment this line after adding position keyframes
-                                    : <span className="inline-block h-6">--</span>
-                                }
-                            </div>
-                            
-                            <div className="property-item">
-                                <label htmlFor="positionZ" className="inline-block h-6">Position Z:</label>
-                                {positionZ !== null ? 
-                                    // isPropertyHasKeyframes(currentLayerKS.p) ?   // TODO: Uncomment this line after adding position keyframes
-                                        renderPropertyInputField("", layerIndex, "positionZ", "number", "0", undefined, positionZ, "p", setPositionZ, 2)
-                                        // : <span>{positionZ}</span>   // TODO: Uncomment this line after adding position keyframes
-                                    : <span className="inline-block h-6">--</span>
-                                }
+
+                            {/* Scale */}
+                            <div className="inline-block">
+                                <div className="property-item flex items-center">
+                                    <label htmlFor="scaleX">Scale X:</label>
+                                    {scaleX !== null ? 
+                                        <>
+                                            {/* {isPropertyHasKeyframes(currentLayerKS.s) &&    // TODO: Uncomment this line after adding scale keyframes */}
+                                            <Box sx={{ width: 150, display: "inline-block", verticalAlign: "middle", marginLeft: "6px", marginRight: "14px" }}>
+                                                <Slider
+                                                    id="scaleX"
+                                                    value={scaleX}
+                                                    min={0}
+                                                    max={200}
+                                                    onChange={(e, newValue) => {
+                                                        setScaleX(newValue as number);
+                                                        handlePropertyChange('s', (newValue as number), 0, currentFrame);
+                                                    }}
+                                                    valueLabelDisplay="off"
+                                                />
+                                            </Box>
+                                            {/* {renderPropertyInputField("h-6", layerIndex, "scaleX", "range", "0", "200", scaleX, "s", setScaleX, 0)} */}
+                                            {/* }   // TODO: Uncomment this line after adding scale keyframes */}
+                                            <span>{scaleX}%</span>
+                                        </> 
+                                        : <span>--</span>
+                                    }
+                                </div>
+                                
+                                <div className="property-item flex items-center">
+                                    <label htmlFor="scaleY">Scale Y:</label>
+                                    {scaleY !== null ? 
+                                        <>
+                                            {/* {isPropertyHasKeyframes(currentLayerKS.s) &&    // TODO: Uncomment this line after adding scale keyframes */}
+                                            <Box sx={{ width: 150, display: "inline-block", verticalAlign: "middle", marginLeft: "6px", marginRight: "14px" }}>
+                                                <Slider
+                                                    id="scaleY"
+                                                    value={scaleY}
+                                                    min={0}
+                                                    max={200}
+                                                    onChange={(e, newValue) => {
+                                                        setScaleY(newValue as number);
+                                                        handlePropertyChange('s', (newValue as number), 1, currentFrame);
+                                                    }}
+                                                    valueLabelDisplay="off"
+                                                />
+                                            </Box>
+                                            {/* {renderPropertyInputField("h-6", layerIndex, "scaleY", "range", "0", "200", scaleY, "s", setScaleY, 1)} */}
+                                            {/* }   // TODO: Uncomment this line after adding scale keyframes */}
+                                            <span>{scaleY}%</span>
+                                        </>
+                                        : <span>--</span>
+                                    }
+                                </div>
+                                
+                                <div className="property-item flex items-center">
+                                    <label htmlFor="scaleZ">Scale Z:</label>
+                                    {scaleZ !== null ? 
+                                        <>
+                                            {/* {isPropertyHasKeyframes(currentLayerKS.s) &&   // TODO: Uncomment this line after adding scale keyframes */}
+                                            <Box sx={{ width: 150, display: "inline-block", verticalAlign: "middle", marginLeft: "6px", marginRight: "14px" }}>
+                                                <Slider
+                                                    id="scaleZ"
+                                                    value={scaleZ}
+                                                    min={0}
+                                                    max={200}
+                                                    onChange={(e, newValue) => {
+                                                        setScaleZ(newValue as number);
+                                                        handlePropertyChange('s', (newValue as number), 2, currentFrame);
+                                                    }}
+                                                    valueLabelDisplay="off"
+                                                />
+                                            </Box>
+                                            {/* {renderPropertyInputField("h-6", layerIndex, "scaleZ", "range", "0", "200", scaleZ, "s", setScaleZ, 2)} */}
+                                            {/* }   // TODO: Uncomment this line after adding scale keyframes */}
+                                            <span>{scaleZ}%</span>
+                                        </>
+                                        : <span>--</span>
+                                    }
+                                </div>
                             </div>
                         </div>
 
-                        {/* Scale */}
-                        <div>
-                            <div className="property-item">
-                                <label htmlFor="scaleX" className="inline-block h-6">Scale X:</label>
-                                {scaleX !== null ? 
-                                    <>
-                                        {/* {isPropertyHasKeyframes(currentLayerKS.s) &&    // TODO: Uncomment this line after adding scale keyframes */}
-                                        {renderPropertyInputField("h-6", layerIndex, "scaleX", "range", "0", "200", scaleX, "s", setScaleX, 0)}
-                                        {/* }   // TODO: Uncomment this line after adding scale keyframes */}
-                                        <span>{scaleX}%</span>
-                                    </> 
-                                    : <span className="inline-block h-6">--</span>
-                                }
-                            </div>
-                            
-                            <div className="property-item">
-                                <label htmlFor="scaleY" className="inline-block h-6">Scale Y:</label>
-                                {scaleY !== null ? 
-                                    <>
-                                        {/* {isPropertyHasKeyframes(currentLayerKS.s) &&    // TODO: Uncomment this line after adding scale keyframes */}
-                                        {renderPropertyInputField("h-6", layerIndex, "scaleY", "range", "0", "200", scaleY, "s", setScaleY, 1)}
-                                        {/* }   // TODO: Uncomment this line after adding scale keyframes */}
-                                        <span>{scaleY}%</span>
-                                    </>
-                                    : <span className="inline-block h-6">--</span>
-                                }
-                            </div>
-                            
-                            <div className="property-item">
-                                <label htmlFor="scaleZ" className="inline-block h-6">Scale Z:</label>
-                                {scaleZ !== null ? 
-                                    <>
-                                        {/* {isPropertyHasKeyframes(currentLayerKS.s) &&   // TODO: Uncomment this line after adding scale keyframes */}
-                                        {renderPropertyInputField("h-6", layerIndex, "scaleZ", "range", "0", "200", scaleZ, "s", setScaleZ, 2)}
-                                        {/* }   // TODO: Uncomment this line after adding scale keyframes */}
-                                        <span>{scaleZ}%</span>
-                                    </>
-                                    : <span className="inline-block h-6">--</span>
-                                }
-                            </div>
-                        </div>
+                        <div className="dividing-line my-2 px-2 border-t-2 border-slate-200 border-dashed"></div>
 
                         {/* Rotation */}
-                        <div className="property-item">
-                            <label htmlFor="rotation" className="inline-block h-6">Rotation:</label>
+                        <div className="property-item flex items-center">
+                            <label htmlFor="rotation">Rotation:</label>
                             {checkValidNumber(rotation) ? 
                                 // isPropertyHasKeyframes(currentLayerKS.r) ?   // TODO: Uncomment this line after adding rotation keyframes
-                                    renderPropertyInputField("", layerIndex, "rotation", "number", "0", undefined, rotation, "r", setRotation)
+                                <TextField
+                                    id="rotation"
+                                    label=""
+                                    type="number"
+                                    value={rotation}
+                                    onChange={(e) => {
+                                        const newValue = parseFloat(e.target.value);
+                                        setRotation(newValue);
+                                        handlePropertyChange('r', newValue);
+                                    }}
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                />
+                                    // renderPropertyInputField("", layerIndex, "rotation", "number", "0", undefined, rotation, "r", setRotation)
                                     // : <span>{rotation}</span>   // TODO: Uncomment this line after adding rotation keyframes
-                                : <span className="inline-block h-6">--</span>
+                                : <span>--</span>
                             }
                         </div>
                     </div>
