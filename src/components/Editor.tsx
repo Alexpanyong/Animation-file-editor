@@ -121,11 +121,11 @@ const Editor: React.FC = () => {
                         <div className="canvas-wrapper flex p-2">
                             <AnimationCanvas timelineContentRef={timelineContentRef} />
                             {selectedLayerIndex !== null ? (
-                                <div className=''>
+                                <div className='flex-1'>
                                     <PropertiesPanel />
                                 </div>
                             ) : (
-                                    <div className="properties-header p-4 ml-4 border border-slate-300 rounded-lg">
+                                    <div className="properties-header flex-1 p-4 ml-4 border border-slate-300 rounded-lg">
                                         Select a layer to view its properties. <br />Drag the red scrubber to view animation.
                                     </div>
                             )}
