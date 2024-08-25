@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "proxy": "https://graphql.lottiefiles.com/",
+  "homepage": "https://Alexpanyong.github.io/Animation-file-editor/",
   "dependencies": {
     "@apollo/client": "^3.10.4",
     "@emotion/react": "^11.11.4",
@@ -36,7 +37,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -59,6 +62,7 @@
   "devDependencies": {
     "@types/lodash": "^4.17.5",
     "@types/react-beautiful-dnd": "^13.1.8",
+    "gh-pages": "^6.1.1",
     "node-sass": "^7.0.3",
     "sass": "^1.77.5"
   }
